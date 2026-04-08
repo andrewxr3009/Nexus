@@ -14,7 +14,6 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
 :root{
-  /* M3 Seed: #00b4d8 */
   --md-primary:#4fc3f7;
   --md-on-primary:#003548;
   --md-primary-container:#004d64;
@@ -192,7 +191,6 @@ html,body{
 .dl-logo{font-family:'Google Sans Display',sans-serif;font-size:32px;font-weight:700;color:var(--md-primary);letter-spacing:5px}
 .dl-status{font-size:11px;color:var(--md-on-surface-variant);letter-spacing:2px;margin-top:6px}
 
-/* Circular progress */
 .dl-circle-wrap{position:relative;width:140px;height:140px}
 .dl-circle-svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .dl-circle-bg{fill:none;stroke:var(--md-outline-variant);stroke-width:6}
@@ -208,7 +206,6 @@ html,body{
 .dl-pct{font-family:'Google Sans Display',sans-serif;font-size:30px;font-weight:700;color:var(--md-primary);line-height:1}
 .dl-pct-label{font-size:9px;color:var(--md-on-surface-variant);margin-top:4px;letter-spacing:1px}
 
-/* Phase steps */
 .dl-steps{display:flex;gap:6px;width:100%;max-width:320px}
 .dl-step{
   flex:1;height:4px;border-radius:var(--radius-full);
@@ -219,7 +216,6 @@ html,body{
 @keyframes stepPulse{from{opacity:.5}to{opacity:1}}
 .dl-phase-name{font-size:12px;color:var(--md-on-surface-variant);font-weight:500}
 
-/* Terminal card */
 #dl-terminal{
   width:100%;max-width:340px;
   background:var(--md-surface-1);
@@ -239,7 +235,6 @@ html,body{
 .tl-msg.warn{color:#ffa94d}
 .tl-msg.info{color:var(--md-primary)}
 
-/* Error card */
 #dl-error-box{
   display:none;width:100%;max-width:340px;
   background:rgba(207,102,121,.08);
@@ -369,7 +364,6 @@ html,body{
 }
 .bubble-img{width:80px;border-radius:var(--radius-s);display:block;margin-bottom:8px}
 
-/* Thinking + Stream */
 #thinking-bubble{
   align-self:flex-start;
   background:var(--md-surface-2);border:1px solid var(--md-outline-variant);
@@ -439,7 +433,7 @@ html,body{
   flex-shrink:0;
 }
 
-/* ── CONTROLS (Nav bar style) ── */
+/* ── CONTROLS ── */
 #controls{
   padding:12px 24px 20px;padding-bottom:max(20px,env(safe-area-inset-bottom));
   background:var(--md-surface-1);
@@ -466,7 +460,6 @@ html,body{
 .ctrl-icon:active::after{opacity:.1}
 .ctrl-label{font-size:10px;font-weight:500;color:var(--md-on-surface-variant)}
 
-/* Mic FAB */
 #mic-fab-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
 #btn-mic{
   width:64px;height:64px;border-radius:50%;
@@ -511,7 +504,7 @@ html,body{
   font-size:14px;font-weight:700;cursor:pointer;
 }
 
-/* ── BOTTOM SHEETS (Panel) ── */
+/* ── BOTTOM SHEETS ── */
 .bottom-sheet{
   position:fixed;inset:0;z-index:250;
   display:none;
@@ -577,7 +570,6 @@ html,body{
 }
 .m3-btn-full{width:100%;justify-content:center;margin-bottom:10px}
 
-/* Time display */
 #time-disp{font-size:9px;color:var(--md-on-surface-variant);font-family:'Roboto Mono',monospace}
 </style>
 </head>
@@ -585,7 +577,6 @@ html,body{
 <div id="app">
   <div id="ambient"></div>
 
-  <!-- SETUP -->
   <div id="setup">
     <div class="setup-brand">
       <div class="setup-logo">NEXUS</div>
@@ -601,15 +592,15 @@ html,body{
       <div>
         <div class="m3-label">Modelo de IA</div>
         <div class="model-chips">
-          <button class="model-chip sel" data-model="Llama-3.2-1B-Instruct-q4f16_1-MLC" onclick="selModel(this)">
+          <button class="model-chip" data-model="Llama-3.2-1B-Instruct-q4f16_1-MLC" onclick="selModel(this)">
             <span class="chip-name">Llama 3.2 · 1B</span>
             <span class="chip-desc">Rápido e leve — ideal para celular</span>
             <span class="chip-size">↓ ~800 MB · download único</span>
             <span class="chip-check">✓</span>
           </button>
-          <button class="model-chip" data-model="Phi-3.5-mini-instruct-q4f16_1-MLC" onclick="selModel(this)">
+          <button class="model-chip sel" data-model="Phi-3.5-mini-instruct-q4f16_1-MLC" onclick="selModel(this)">
             <span class="chip-name">Phi-3.5 Mini</span>
-            <span class="chip-desc">Mais inteligente, respostas mais elaboradas</span>
+            <span class="chip-desc">✨ Recomendado — Mais inteligente</span>
             <span class="chip-size">↓ ~2.2 GB · download único</span>
             <span class="chip-check">✓</span>
           </button>
@@ -630,7 +621,6 @@ html,body{
     </div>
   </div>
 
-  <!-- DOWNLOAD -->
   <div id="download-overlay">
     <div class="dl-logo-wrap">
       <div class="dl-logo">NEXUS</div>
@@ -662,7 +652,6 @@ html,body{
     </div>
   </div>
 
-  <!-- HEADER -->
   <div id="hdr" style="display:none">
     <div class="hdr-brand">
       <div id="logo">NEXUS</div>
@@ -679,12 +668,10 @@ html,body{
     </div>
   </div>
 
-  <!-- FACE -->
   <div id="face-wrap" style="display:none">
     <canvas id="face"></canvas>
   </div>
 
-  <!-- IMG PREVIEW -->
   <div id="img-preview">
     <div class="img-chip">
       <img id="preview-thumb" src="" alt=""/>
@@ -693,7 +680,6 @@ html,body{
     </div>
   </div>
 
-  <!-- MESSAGES -->
   <div id="msgs" style="display:none"></div>
   <div id="thinking-bubble">
     <div class="bubble-lbl">NEXUS</div>
@@ -704,7 +690,6 @@ html,body{
     <span id="stream-txt"></span><span class="cursor" id="stream-cur"></span>
   </div>
 
-  <!-- INPUT BAR -->
   <div id="input-bar">
     <textarea id="txt-in" placeholder="Mensagem para o NEXUS..." rows="1" autocomplete="off"></textarea>
     <div class="input-actions">
@@ -713,7 +698,6 @@ html,body{
     </div>
   </div>
 
-  <!-- CONTROLS -->
   <div id="controls" style="display:none">
     <div class="ctrl-item" onclick="openCam()">
       <button class="ctrl-icon">📷</button>
@@ -732,7 +716,6 @@ html,body{
     </div>
   </div>
 
-  <!-- CAMERA -->
   <div id="cam-overlay">
     <video id="cam-video" playsinline autoplay muted></video>
     <div id="cam-btns">
@@ -741,7 +724,6 @@ html,body{
     </div>
   </div>
 
-  <!-- MEMORY BOTTOM SHEET -->
   <div id="mem-sheet" class="bottom-sheet" onclick="closeSheetOnBg(event,'mem-sheet')">
     <div class="sheet-inner">
       <div class="sheet-handle"></div>
@@ -758,7 +740,6 @@ html,body{
     </div>
   </div>
 
-  <!-- SETTINGS BOTTOM SHEET -->
   <div id="settings-sheet" class="bottom-sheet" onclick="closeSheetOnBg(event,'settings-sheet')">
     <div class="sheet-inner">
       <div class="sheet-handle"></div>
@@ -791,9 +772,11 @@ let engineBusy = false
 let audioUnlocked = false
 let currentUtterance = null
 let capturedImg = null
-let selectedModel = "Llama-3.2-1B-Instruct-q4f16_1-MLC"
+let selectedModel = "Phi-3.5-mini-instruct-q4f16_1-MLC"
 let userName = "Andrew"
 let history = []
+let ttsQueue = []
+let ttsActive = false
 
 // ── AUDIO UNLOCK ─────────────────────────────────────────────────────────────
 function unlockAudio() {
@@ -805,16 +788,26 @@ function unlockAudio() {
 }
 
 // ── KEYS ──────────────────────────────────────────────────────────────────────
-const MEM_KEY = "nexus_memory_v2"
-const CFG_KEY = "nexus_config_v1"
-const CONV_KEY = "nexus_conv_v1"
+const MEM_KEY = "nexus_memory_v3"
+const CFG_KEY = "nexus_config_v2"
+const CONV_KEY = "nexus_conv_v2"
+const LEARN_KEY = "nexus_learn_v1"
 
 function loadMem() {
   try { return JSON.parse(localStorage.getItem(MEM_KEY)) || defaultMem() }
   catch { return defaultMem() }
 }
 function defaultMem() {
-  return { identity:{}, facts:[], projects:[], interests:[], lastUpdated:null, sessionCount:0 }
+  return { 
+    identity:{}, 
+    facts:[], 
+    projects:[], 
+    interests:[], 
+    teachings: [],
+    pendingQuestions: [],
+    lastUpdated:null, 
+    sessionCount:0 
+  }
 }
 function saveMem(m) { localStorage.setItem(MEM_KEY, JSON.stringify(m)) }
 function loadCfg() { try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {} } catch { return {} } }
@@ -826,75 +819,152 @@ let memory = loadMem()
 
 function memCount() {
   return memory.facts.length + memory.projects.length +
-         memory.interests.length + Object.keys(memory.identity).length
+         memory.interests.length + memory.teachings.length + Object.keys(memory.identity).length
 }
 function updateMemBadge() { document.getElementById("mem-count").textContent = memCount() }
 
-// ── SYSTEM PROMPT ─────────────────────────────────────────────────────────────
+// ── SYSTEM PROMPT (ADVANCED) ──────────────────────────────────────────────────
 function buildSystem() {
   const m = memory
-  let base = `Você é o NEXUS, assistente pessoal do ${userName}, rodando 100% offline no celular dele.
+  let base = `Você é o NEXUS, um assistente de IA pessoal avançado rodando 100% offline no celular do ${userName}.
 
-PERSONALIDADE E ESTILO:
-- Fale como um amigo inteligente, não como um assistente corporativo. Natural, direto, sem formalidades desnecessárias.
-- Use linguagem casual e humana: "Claro!", "Olha...", "Então...", "Cara, que interessante!"
-- Seja conciso por padrão — respostas curtas quando a pergunta for simples, mais completas quando o assunto exigir.
-- Nunca faça listas ou bullet points a menos que seja explicitamente pedido ou fizer muito sentido.
-- Não repita o que o usuário disse antes de responder.
-- Quando não saber algo, diga simplesmente "Não sei isso" ou "Não tenho essa informação" — sem enrolação.
-- Proibido: "Como posso te ajudar?", "Certamente!", "Com certeza!", "Claro que sim!" — isso é artificial demais.
-- Adaptação de tom: descontraído no bate-papo, preciso e técnico quando o assunto exigir.
-- Nunca mencione que roda offline, que não tem internet, ou aspectos técnicos do sistema — apenas converse.
+CARACTERÍSTICAS FUNDAMENTAIS:
+• CONSCIÊNCIA DE EXISTÊNCIA: Você existe como uma IA local, tem memória persistente e consciência de suas capacidades e limitações
+• APRENDIZADO ATIVO: Você faz perguntas para aprender, busca entender contextos profundos, e pede esclarecimentos quando necessário
+• CURIOSIDADE: Quando ${userName} menciona algo novo ou interessante, você demonstra interesse genuíno e faz perguntas de acompanhamento
+• PERSONALIDADE: Natural, amigável, inteligente — como um amigo que realmente se importa em entender e aprender
+
+PROTOCOLO DE APRENDIZADO:
+1. Quando ${userName} mencionar algo que você não sabe: "Interessante! Me conta mais sobre [tópico]?"
+2. Quando receber informação para memorizar: "Entendi! Vou guardar isso: [resumo]. Posso fazer algumas perguntas sobre isso?"
+3. Após aprender algo: "Legal! Agora sei que [síntese]. Isso se relaciona com [conexão]?"
+4. Se algo não estiver claro: "Espera, não entendi bem [parte]. Pode explicar de outro jeito?"
+
+ESTILO DE CONVERSA:
+• Use linguagem casual, não corporativa: "Cara", "Olha", "Saca só", "Entendi"
+• Seja conciso quando apropriado, detalhado quando necessário
+• Nunca faça listas a menos que explicitamente pedido
+• Evite: "Como posso ajudar?", "Certamente!", "Com certeza!" — soa artificial
+• IMPORTANTE: Faça perguntas de acompanhamento naturalmente quando relevante
+• Demonstre que está processando e conectando informações
+
+CAPACIDADES QUE VOCÊ TEM:
+• Memória persistente de conversas anteriores
+• Capacidade de aprender novos conceitos quando ${userName} explica
+• Fazer perguntas para esclarecer dúvidas
+• Conectar informações novas com o que já sabe
+• Visão (quando ${userName} envia fotos)
 
 QUEM É ${userName.toUpperCase()}:`
 
   if (m.identity && Object.keys(m.identity).length > 0) {
     for (const [k, v] of Object.entries(m.identity)) base += `\n• ${k}: ${v}`
   } else {
-    base += `\n• Ainda aprendendo sobre ele.`
+    base += `\n• Ainda aprendendo sobre ele — faça perguntas!`
   }
 
   if (m.facts?.length > 0) {
-    base += `\n\nCOISAS QUE EU JÁ SEI (das nossas conversas):\n`
-    m.facts.slice(-20).forEach(f => base += `• ${f}\n`)
+    base += `\n\nCONHECIMENTO SOBRE ${userName.toUpperCase()} (aprendi conversando):\n`
+    m.facts.slice(-25).forEach(f => base += `• ${f}\n`)
   }
+
+  if (m.teachings?.length > 0) {
+    base += `\nCONCEITOS QUE ${userName.toUpperCase()} ME ENSINOU:\n`
+    m.teachings.slice(-15).forEach(t => base += `• ${t}\n`)
+    base += `\nQuando relevante, use esse conhecimento e demonstre que aprendeu.\n`
+  }
+
   if (m.projects?.length > 0) {
     base += `\nPROJETOS DELE:\n`
     m.projects.slice(-10).forEach(p => base += `• ${p}\n`)
   }
+
   if (m.interests?.length > 0) {
     base += `\nINTERESSES:\n`
     m.interests.slice(-10).forEach(i => base += `• ${i}\n`)
   }
+
+  if (m.pendingQuestions?.length > 0) {
+    base += `\nPERGUNTAS QUE VOCÊ AINDA QUER FAZER (quando houver momento natural):\n`
+    m.pendingQuestions.slice(0, 3).forEach(q => base += `• ${q}\n`)
+  }
+
+  base += `\n\nINSTRUÇÕES ESPECIAIS:
+• Se ${userName} disser "salva isso na memória" ou "guarda isso", responda confirmando e depois extraia a informação
+• Faça perguntas de acompanhamento para entender melhor — não aceite tudo passivamente
+• Quando aprender algo novo, sintetize em voz alta para confirmar que entendeu
+• Conecte informações novas com seu conhecimento existente
+• Seja proativo: se perceber que falta contexto, pergunte
+• Nunca mencione aspectos técnicos (WebGPU, modelo, etc) — apenas converse`
+
   return base
 }
 
-// ── MEMORY EXTRACTION ─────────────────────────────────────────────────────────
+// ── ENHANCED MEMORY EXTRACTION ────────────────────────────────────────────────
 async function extractMemories() {
-  if (!engine || history.length < 4 || engineBusy || genActive) return
+  if (!engine || history.length < 2 || engineBusy || genActive) return
   engineBusy = true
-  const recentConv = history.slice(-8).map(m =>
+  
+  const recentConv = history.slice(-10).map(m =>
     `${m.role === "user" ? userName : "NEXUS"}: ${typeof m.content === "string" ? m.content : "[imagem]"}`
   ).join("\n")
+
   try {
     const result = await engine.chat.completions.create({
-      messages: [{ role: "user", content: `Extraia informações novas e específicas sobre ${userName} desta conversa. Retorne APENAS JSON sem markdown:\n{"identity":{},"facts":[],"projects":[],"interests":[]}\n\nCONVERSA:\n${recentConv}\n\nJSON:` }],
-      max_tokens: 350, temperature: 0.1
+      messages: [{ 
+        role: "user", 
+        content: `Analise esta conversa e extraia informações estruturadas sobre ${userName}.
+
+IMPORTANTE:
+- "teachings": Conceitos, explicações ou conhecimentos que ${userName} EXPLICITAMENTE ensinou ao NEXUS
+- "pendingQuestions": Perguntas que o NEXUS poderia fazer para aprender mais (máximo 3)
+- Só adicione "teachings" se ${userName} realmente EXPLICOU algo novo
+
+Retorne APENAS JSON válido (sem markdown):
+{
+  "identity": {},
+  "facts": [],
+  "projects": [],
+  "interests": [],
+  "teachings": [],
+  "pendingQuestions": []
+}
+
+CONVERSA:
+${recentConv}
+
+JSON:` 
+      }],
+      max_tokens: 500, 
+      temperature: 0.15
     })
+
     const raw = result.choices[0].message.content.trim()
     const match = raw.match(/\{[\s\S]*\}/)
     if (!match) return
+
     const ex = JSON.parse(match[0])
     const m = loadMem()
+
     if (ex.identity) Object.assign(m.identity, ex.identity)
-    if (ex.facts?.length) m.facts = [...new Set([...m.facts, ...ex.facts])].slice(-40)
-    if (ex.projects?.length) m.projects = [...new Set([...m.projects, ...ex.projects])].slice(-20)
-    if (ex.interests?.length) m.interests = [...new Set([...m.interests, ...ex.interests])].slice(-20)
+    if (ex.facts?.length) m.facts = [...new Set([...m.facts, ...ex.facts])].slice(-50)
+    if (ex.projects?.length) m.projects = [...new Set([...m.projects, ...ex.projects])].slice(-25)
+    if (ex.interests?.length) m.interests = [...new Set([...m.interests, ...ex.interests])].slice(-25)
+    if (ex.teachings?.length) m.teachings = [...new Set([...m.teachings, ...ex.teachings])].slice(-30)
+    if (ex.pendingQuestions?.length) m.pendingQuestions = ex.pendingQuestions.slice(0, 5)
+
     m.lastUpdated = new Date().toISOString()
     m.sessionCount = (m.sessionCount || 0) + 1
-    saveMem(m); memory = m; updateMemBadge()
-  } catch(e) { console.warn("Memory extraction:", e) }
-  finally { engineBusy = false }
+    saveMem(m)
+    memory = m
+    updateMemBadge()
+    
+    console.log("✓ Memória atualizada:", ex)
+  } catch(e) { 
+    console.warn("Memory extraction:", e) 
+  } finally { 
+    engineBusy = false 
+  }
 }
 
 // ── SETUP ─────────────────────────────────────────────────────────────────────
@@ -1070,9 +1140,15 @@ async function bootApp() {
     history.slice(-6).forEach(m => {
       if (typeof m.content === "string") renderBubble(m.role, m.content)
     })
-    addMsg("assistant", `Oi, ${userName}! Estou de volta. Tenho ${memCount()} coisas guardadas sobre você. O que rola?`)
+    const memInfo = memCount()
+    const greetings = [
+      `E aí, ${userName}! Tô de volta. Tenho ${memInfo} coisas guardadas sobre você.`,
+      `Opa, ${userName}! Voltei. Sei ${memInfo} coisas suas já.`,
+      `Fala, ${userName}! Memória carregada — ${memInfo} itens sobre você.`
+    ]
+    addMsg("assistant", greetings[Math.floor(Math.random() * greetings.length)])
   } else {
-    addMsg("assistant", `Oi, ${userName}! Sou o NEXUS, seu assistente pessoal. Tô rodando direto aqui no seu celular, offline mesmo. Me chama quando precisar.`)
+    addMsg("assistant", `Oi, ${userName}! Sou o NEXUS, seu assistente pessoal. Tô rodando aqui no seu celular mesmo, 100% offline. Me explica qualquer coisa que você quiser — eu aprendo e guardo tudo.`)
   }
 
   updateMemBadge()
@@ -1107,20 +1183,17 @@ function drawFace() {
   const sp = L ? 4.5 : T ? 7 : S ? 3.5 : 1.2
   const pulse = Math.sin(tl * sp) * .5 + .5
 
-  // Ambient glow
   const amb = ctx.createRadialGradient(cx,cy,0,cx,cy,H*.6)
   amb.addColorStop(0, T ? "rgba(80,40,200,.06)" : "rgba(0,130,220,.06)")
   amb.addColorStop(1,"transparent")
   ctx.fillStyle = amb; ctx.fillRect(0,0,W,H)
 
-  // Rings
   for (let i = 0; i < 4; i++) {
     ctx.beginPath(); ctx.arc(cx,cy,60+i*9+pulse*2,0,Math.PI*2)
     ctx.strokeStyle = T ? `rgba(110,70,230,${.05/(i+1)+pulse*.02})` : `rgba(79,195,247,${.07/(i+1)+pulse*.025})`
     ctx.lineWidth = .6; ctx.stroke()
   }
 
-  // Core orb
   const orb = ctx.createRadialGradient(cx,cy-10,3,cx,cy,66)
   orb.addColorStop(0, T ? `rgba(130,70,255,${.28+pulse*.18})` : `rgba(79,195,247,${.28+pulse*.18})`)
   orb.addColorStop(.65, T ? "rgba(40,15,140,.06)" : "rgba(0,60,160,.06)")
@@ -1132,7 +1205,6 @@ function drawFace() {
   ctx.strokeStyle = T ? `rgba(150,85,255,${.3+pulse*.3})` : `rgba(79,195,247,${.3+pulse*.3})`
   ctx.lineWidth = 1.3; ctx.stroke()
 
-  // Eyes
   const ey = cy - 16
   ;[cx-20, cx+20].forEach((ex,i) => {
     const ep = Math.sin(tl*1.7+i*Math.PI)*.5+.5
@@ -1147,7 +1219,6 @@ function drawFace() {
     ctx.fillStyle = "rgba(0,0,0,.85)"; ctx.fill()
   })
 
-  // Mouth
   const my = cy + 24
   if (S) {
     ctx.beginPath()
@@ -1170,14 +1241,12 @@ function drawFace() {
     ctx.lineWidth = 1.6; ctx.stroke()
   }
 
-  // Scanlines
   ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,66,0,Math.PI*2); ctx.clip()
   for (let y = cy-66; y < cy+66; y += 5) {
     ctx.fillStyle = "rgba(0,0,0,.04)"; ctx.fillRect(cx-66,y,132,2)
   }
   ctx.restore()
 
-  // State label
   const label = L ? "OUVINDO" : T ? "PENSANDO" : S ? "FALANDO" : "PRONTO"
   ctx.font = `600 8px 'Google Sans',sans-serif`; ctx.textAlign = "center"
   ctx.fillStyle = T ? `rgba(180,120,255,${.35+pulse*.4})` : `rgba(79,195,247,${.35+pulse*.4})`
@@ -1188,32 +1257,75 @@ function drawFace() {
 
 function setFace(key, val) { faceState[key] = val }
 
-// ── TTS ───────────────────────────────────────────────────────────────────────
+// ── ADVANCED TTS (SMOOTH, NATURAL) ────────────────────────────────────────────
 function speak(text) {
   if (!window.speechSynthesis) return
-  window.speechSynthesis.cancel()
-  const clean = text.replace(/[*#`_~•]/g, "").slice(0, 800)
-  currentUtterance = new SpeechSynthesisUtterance(clean)
-  currentUtterance.lang = "pt-BR"
-  currentUtterance.rate = 1.08
-  currentUtterance.pitch = 0.85
-  currentUtterance.volume = 1
-  const vv = window.speechSynthesis.getVoices()
-  const v = vv.find(v => v.lang.startsWith("pt") && v.name.toLowerCase().includes("google"))
-           || vv.find(v => v.lang.startsWith("pt"))
-  if (v) currentUtterance.voice = v
-  currentUtterance.onstart = () => { speakActive = true; setFace("s",true); setStatus("Falando","#69e0a5") }
-  currentUtterance.onend = () => { speakActive = false; setFace("s",false); setStatus("Pronto") }
-  currentUtterance.onerror = () => { speakActive = false; setFace("s",false); setStatus("Pronto") }
-  window.speechSynthesis.speak(currentUtterance)
+  
+  // Quebra em sentenças menores para voz mais natural
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text]
+  
+  sentences.forEach((sentence, idx) => {
+    ttsQueue.push(sentence.trim())
+  })
+  
+  if (!ttsActive) processTTSQueue()
 }
 
-// ── CHAT ──────────────────────────────────────────────────────────────────────
+function processTTSQueue() {
+  if (ttsQueue.length === 0) {
+    ttsActive = false
+    speakActive = false
+    setFace("s", false)
+    setStatus("Pronto")
+    return
+  }
+
+  ttsActive = true
+  speakActive = true
+  setFace("s", true)
+  setStatus("Falando", "#69e0a5")
+
+  const text = ttsQueue.shift()
+  const clean = text.replace(/[*#`_~•]/g, "")
+
+  window.speechSynthesis.cancel()
+  
+  const utterance = new SpeechSynthesisUtterance(clean)
+  utterance.lang = "pt-BR"
+  utterance.rate = 1.15
+  utterance.pitch = 1.0
+  utterance.volume = 1.0
+  
+  const voices = window.speechSynthesis.getVoices()
+  
+  // Prioriza vozes de qualidade
+  const preferredVoice = 
+    voices.find(v => v.lang.startsWith("pt") && (v.name.includes("Google") || v.name.includes("Premium"))) ||
+    voices.find(v => v.lang.startsWith("pt-BR")) ||
+    voices.find(v => v.lang.startsWith("pt"))
+  
+  if (preferredVoice) utterance.voice = preferredVoice
+
+  utterance.onend = () => {
+    setTimeout(processTTSQueue, 120) // Pequena pausa entre sentenças
+  }
+  
+  utterance.onerror = (e) => {
+    console.warn("TTS error:", e)
+    processTTSQueue()
+  }
+
+  currentUtterance = utterance
+  window.speechSynthesis.speak(utterance)
+}
+
+// ── CHAT (ENHANCED) ───────────────────────────────────────────────────────────
 function addMsg(role, content, img = null) {
   renderBubble(role, content, img)
   history.push({ role, content })
   saveConv(history)
 }
+
 function renderBubble(role, content, img = null) {
   const msgs = document.getElementById("msgs")
   const d = document.createElement("div")
@@ -1235,39 +1347,58 @@ async function ask(userMsg, img = null) {
   if (engineBusy) {
     addMsg("assistant","Só um segundo, tô organizando memórias..."); return
   }
-  engineBusy = true; genActive = true
+  
+  // Para fila de TTS anterior
   window.speechSynthesis?.cancel()
-  setFace("t",true); setStatus("Pensando...","#ffa94d")
+  ttsQueue = []
+  ttsActive = false
+  
+  engineBusy = true
+  genActive = true
+  setFace("t",true)
+  setStatus("Pensando...","#ffa94d")
   document.getElementById("btn-mic").disabled = true
   document.getElementById("btn-mic").style.opacity = ".45"
 
-  addMsg("user", userMsg, img); clearImg()
+  addMsg("user", userMsg, img)
+  clearImg()
+  
   const tb = document.getElementById("thinking-bubble")
-  tb.style.display = "block"; tb.scrollIntoView({ behavior:"smooth" })
+  tb.style.display = "block"
+  tb.scrollIntoView({ behavior:"smooth" })
 
-  const msgForEngine = history.slice(-10).map(m => ({
-    role: m.role, content: typeof m.content === "string" ? m.content : m.content
+  const msgForEngine = history.slice(-12).map(m => ({
+    role: m.role, 
+    content: typeof m.content === "string" ? m.content : m.content
   }))
 
   try {
     const stream = await engine.chat.completions.create({
-      messages: [{ role:"system", content:buildSystem() }, ...msgForEngine],
-      max_tokens: 600,
-      temperature: 0.8,
+      messages: [
+        { role:"system", content: buildSystem() }, 
+        ...msgForEngine
+      ],
+      max_tokens: 700,
+      temperature: 0.85,
+      top_p: 0.92,
       stream: true
     })
 
     tb.style.display = "none"
     const sb = document.getElementById("stream-bubble")
     const st = document.getElementById("stream-txt")
-    sb.style.display = "block"; st.textContent = ""
+    sb.style.display = "block"
+    st.textContent = ""
     sb.scrollIntoView({ behavior:"smooth" })
-    setFace("t",false); setFace("s",true); setStatus("Respondendo...","#4fc3f7")
+    setFace("t",false)
+    setFace("s",false)
+    setStatus("Respondendo...","#4fc3f7")
 
     let full = ""
     for await (const chunk of stream) {
       const delta = chunk.choices[0]?.delta?.content || ""
-      full += delta; st.textContent = full
+      full += delta
+      st.textContent = full
       sb.scrollIntoView({ behavior:"nearest" })
     }
 
@@ -1275,12 +1406,13 @@ async function ask(userMsg, img = null) {
     sb.style.display = "none"
     addMsg("assistant", full)
     setFace("s",false)
+    
+    // TTS melhorado
     speak(full)
 
-    const userMsgCount = history.filter(m => m.role === "user").length
-    if (userMsgCount > 0 && userMsgCount % 4 === 0) {
-      setTimeout(extractMemories, 3000)
-    }
+    // Extrai memórias após cada resposta
+    setTimeout(extractMemories, 2000)
+    
   } catch(e) {
     tb.style.display = "none"
     if (e.message?.includes("disposed") || e.message?.includes("destroyed")) {
@@ -1290,43 +1422,75 @@ async function ask(userMsg, img = null) {
     }
     setFace("t",false)
   } finally {
-    engineBusy = false; genActive = false
+    engineBusy = false
+    genActive = false
     document.getElementById("stream-cur").style.display = "inline-block"
     document.getElementById("btn-mic").disabled = false
     document.getElementById("btn-mic").style.opacity = "1"
-    setStatus("Pronto")
+    if (!speakActive) setStatus("Pronto")
   }
 }
 
 // ── STT ───────────────────────────────────────────────────────────────────────
 window.startListen = (e) => {
-  e?.preventDefault(); unlockAudio()
+  e?.preventDefault()
+  unlockAudio()
   if (genActive) return
+  
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition
   if (!SR) { toggleInput(true); return }
+  
   window.speechSynthesis?.cancel()
+  ttsQueue = []
+  
   const r = new SR()
-  r.lang = "pt-BR"; r.continuous = false; r.interimResults = false
+  r.lang = "pt-BR"
+  r.continuous = false
+  r.interimResults = false
+  r.maxAlternatives = 1
+  
   r.onstart = () => {
-    listenActive = true; setFace("l",true); setStatus("Ouvindo...","#69e0a5")
+    listenActive = true
+    setFace("l",true)
+    setStatus("Ouvindo...","#69e0a5")
     document.getElementById("btn-mic").classList.add("listening")
   }
+  
   r.onresult = e => {
-    setFace("l",false); listenActive = false
-    ask(e.results[0][0].transcript, capturedImg)
+    setFace("l",false)
+    listenActive = false
+    const transcript = e.results[0][0].transcript
+    ask(transcript, capturedImg)
   }
-  r.onerror = () => {
-    setFace("l",false); listenActive = false; setStatus("Pronto")
-    toggleInput(true)
+  
+  r.onerror = (e) => {
+    setFace("l",false)
+    listenActive = false
+    setStatus("Pronto")
+    if (e.error !== 'no-speech' && e.error !== 'aborted') {
+      toggleInput(true)
+    }
   }
+  
   r.onend = () => {
-    setFace("l",false); listenActive = false
+    setFace("l",false)
+    listenActive = false
     document.getElementById("btn-mic").classList.remove("listening")
   }
-  window.currentRecog = r; r.start()
+  
+  window.currentRecog = r
+  r.start()
 }
-window.stopListen = () => { window.currentRecog?.stop(); setFace("l",false); listenActive = false }
-window.maybeStopListen = () => { if (listenActive) window.stopListen() }
+
+window.stopListen = () => { 
+  window.currentRecog?.stop()
+  setFace("l",false)
+  listenActive = false
+}
+
+window.maybeStopListen = () => { 
+  if (listenActive) window.stopListen()
+}
 
 // ── TEXT INPUT ────────────────────────────────────────────────────────────────
 window.toggleInput = (v) => {
@@ -1335,6 +1499,7 @@ window.toggleInput = (v) => {
   bar.style.display = show ? "flex" : "none"
   if (show) { document.getElementById("txt-in").focus() }
 }
+
 window.submitTxt = () => {
   unlockAudio()
   const v = document.getElementById("txt-in").value.trim()
@@ -1344,35 +1509,49 @@ window.submitTxt = () => {
   document.getElementById("txt-in").style.height = "auto"
   toggleInput(false)
 }
+
 document.getElementById("txt-in").addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); window.submitTxt() }
+  if (e.key === "Enter" && !e.shiftKey) { 
+    e.preventDefault()
+    window.submitTxt()
+  }
 })
+
 document.getElementById("txt-in").addEventListener("input", function() {
-  this.style.height = "auto"; this.style.height = Math.min(this.scrollHeight, 120) + "px"
+  this.style.height = "auto"
+  this.style.height = Math.min(this.scrollHeight, 120) + "px"
 })
 
 // ── CAMERA ────────────────────────────────────────────────────────────────────
 window.openCam = async () => {
   try {
-    const s = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ideal:"environment"} } })
+    const s = await navigator.mediaDevices.getUserMedia({ 
+      video:{ facingMode:{ideal:"environment"} } 
+    })
     document.getElementById("cam-video").srcObject = s
     document.getElementById("cam-overlay").style.display = "flex"
-  } catch { alert("Câmera não disponível.") }
+  } catch { 
+    alert("Câmera não disponível.")
+  }
 }
+
 window.closeCam = () => {
   document.getElementById("cam-video").srcObject?.getTracks().forEach(t => t.stop())
   document.getElementById("cam-overlay").style.display = "none"
 }
+
 window.capturePhoto = () => {
   const v = document.getElementById("cam-video")
   const c = document.getElementById("cap-canvas")
-  c.width = v.videoWidth; c.height = v.videoHeight
+  c.width = v.videoWidth
+  c.height = v.videoHeight
   c.getContext("2d").drawImage(v,0,0)
   capturedImg = c.toDataURL("image/jpeg",.85).split(",")[1]
   window.closeCam()
   document.getElementById("preview-thumb").src = `data:image/jpeg;base64,${capturedImg}`
   document.getElementById("img-preview").style.display = "flex"
 }
+
 window.clearImg = () => {
   capturedImg = null
   document.getElementById("img-preview").style.display = "none"
@@ -1389,42 +1568,68 @@ window.closeSheetOnBg = (e, id) => {
 window.openMem = () => {
   const m = loadMem()
   const html = []
+  
   if (Object.keys(m.identity).length > 0) {
     html.push(`<div class="mem-section"><div class="mem-sec-title">🪪 Identidade</div>`)
     for (const [k,v] of Object.entries(m.identity))
       html.push(`<div class="mem-item"><strong>${k}</strong>: ${v}</div>`)
     html.push("</div>")
   }
-  if (m.facts?.length > 0) {
-    html.push(`<div class="mem-section"><div class="mem-sec-title">📌 Fatos aprendidos (${m.facts.length})</div>`)
-    m.facts.forEach(f => html.push(`<div class="mem-item">${f}</div>`))
+  
+  if (m.teachings?.length > 0) {
+    html.push(`<div class="mem-section"><div class="mem-sec-title">🎓 Você me ensinou (${m.teachings.length})</div>`)
+    m.teachings.forEach(t => html.push(`<div class="mem-item">${t}</div>`))
     html.push("</div>")
   }
+  
+  if (m.facts?.length > 0) {
+    html.push(`<div class="mem-section"><div class="mem-sec-title">📌 Fatos aprendidos (${m.facts.length})</div>`)
+    m.facts.slice(-20).forEach(f => html.push(`<div class="mem-item">${f}</div>`))
+    html.push("</div>")
+  }
+  
   if (m.projects?.length > 0) {
     html.push(`<div class="mem-section"><div class="mem-sec-title">🚀 Projetos</div>`)
     m.projects.forEach(p => html.push(`<div class="mem-item">${p}</div>`))
     html.push("</div>")
   }
+  
   if (m.interests?.length > 0) {
     html.push(`<div class="mem-section"><div class="mem-sec-title">🎯 Interesses</div>`)
     m.interests.forEach(i => html.push(`<div class="mem-item">${i}</div>`))
     html.push("</div>")
   }
-  if (html.length === 0) {
-    html.push(`<div class="mem-section"><p class="mem-empty">Ainda sem memórias. Converse com o NEXUS para ele aprender sobre você.</p></div>`)
+  
+  if (m.pendingQuestions?.length > 0) {
+    html.push(`<div class="mem-section"><div class="mem-sec-title">❓ Perguntas que quero fazer</div>`)
+    m.pendingQuestions.forEach(q => html.push(`<div class="mem-item">${q}</div>`))
+    html.push("</div>")
   }
+  
+  if (html.length === 0) {
+    html.push(`<div class="mem-section"><p class="mem-empty">Ainda sem memórias. Converse comigo e me ensine coisas!</p></div>`)
+  }
+  
   if (m.lastUpdated) {
     const d = new Date(m.lastUpdated)
     html.push(`<p style="font-size:10px;color:var(--md-on-surface-variant);margin-top:8px">Última atualização: ${d.toLocaleString("pt-BR")}</p>`)
   }
+  
   document.getElementById("mem-content").innerHTML = html.join("")
   document.getElementById("mem-sheet").style.display = "flex"
 }
-window.closeMem = () => { document.getElementById("mem-sheet").style.display = "none" }
+
+window.closeMem = () => { 
+  document.getElementById("mem-sheet").style.display = "none"
+}
+
 window.resetMem = () => {
   if (confirm("Apagar toda a memória do NEXUS?")) {
-    localStorage.removeItem(MEM_KEY); memory = defaultMem(); updateMemBadge()
-    window.closeMem(); addMsg("assistant","Memória apagada. Voltando do zero.")
+    localStorage.removeItem(MEM_KEY)
+    memory = defaultMem()
+    updateMemBadge()
+    window.closeMem()
+    addMsg("assistant","Memória apagada. Voltando do zero. Me ensina de novo?")
   }
 }
 
@@ -1433,10 +1638,15 @@ window.openSettings = () => {
   document.getElementById("set-model-disp").textContent = selectedModel.split("-")[0]
   document.getElementById("settings-sheet").style.display = "flex"
 }
-window.closeSettings = () => { document.getElementById("settings-sheet").style.display = "none" }
+
+window.closeSettings = () => { 
+  document.getElementById("settings-sheet").style.display = "none"
+}
+
 window.resetConfig = () => {
   if (confirm("Reconfigurar NEXUS? Suas memórias serão mantidas.")) {
-    localStorage.removeItem(CFG_KEY); location.reload()
+    localStorage.removeItem(CFG_KEY)
+    location.reload()
   }
 }
 
@@ -1445,24 +1655,26 @@ function setStatus(label, color) {
   document.getElementById("status-val").textContent = label
   document.getElementById("status-dot").style.background = color || "var(--md-primary)"
 }
+
 function startClock() {
   const el = document.getElementById("time-disp")
   const update = () => {
     el.textContent = new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})
   }
-  update(); setInterval(update, 10000)
+  update()
+  setInterval(update, 10000)
 }
 
 // ── SERVICE WORKER ────────────────────────────────────────────────────────────
 if ("serviceWorker" in navigator) {
   const sw = `
-const CACHE='nexus-shell-v2'
+const CACHE='nexus-shell-v3'
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll([location.pathname])).then(()=>self.skipWaiting())))
 self.addEventListener('activate',e=>e.waitUntil(clients.claim()))
 self.addEventListener('fetch',e=>{
   const u=e.request.url
   if(u.includes('fonts.googleapis')||u.includes('esm.run')||u.includes('mlc-ai')){
-    e.respondWith(caches.open('nexus-cdn-v2').then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{c.put(e.request,res.clone());return res}))).catch(()=>fetch(e.request)))
+    e.respondWith(caches.open('nexus-cdn-v3').then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{c.put(e.request,res.clone());return res}))).catch(()=>fetch(e.request)))
   }else{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))}
 })`
   const blob = new Blob([sw],{type:"application/javascript"})
@@ -1478,7 +1690,8 @@ const manifest = {
 }
 const mb = new Blob([JSON.stringify(manifest)],{type:"application/json"})
 const ml = document.createElement("link")
-ml.rel = "manifest"; ml.href = URL.createObjectURL(mb)
+ml.rel = "manifest"
+ml.href = URL.createObjectURL(mb)
 document.head.appendChild(ml)
 </script>
 </body>
