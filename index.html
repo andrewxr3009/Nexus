@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"/>
+<title>NEXUS</title>
+<meta name="theme-color" content="#00060f"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="NEXUS"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --c1:#00d4ff;--c2:#0055cc;--c3:#6040ff;
+  --bg:#00060f;--glass:rgba(0,14,40,.7);
+  --border:rgba(0,140,220,.18);--text:#b0d8f5;--dim:rgba(0,160,230,.45);
+  --green:#00ff88;--orange:#ffaa00;--red:#ff4444
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+  font-family:'Share Tech Mono',monospace;touch-action:manipulation;
+  -webkit-overflow-scrolling:touch}
+#app{height:100%;height:100dvh;display:flex;flex-direction:column;position:relative}
+
+/* GRID BG */
+#grid{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(0,140,220,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,140,220,.022) 1px,transparent 1px);
+  background-size:40px 40px;animation:gridDrift 60s linear infinite}
+@keyframes gridDrift{0%{background-position:0 0}100%{background-position:40px 40px}}
+
+/* SETUP SCREEN */
+#setup{position:fixed;inset:0;z-index:300;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:28px;gap:0}
+.setup-logo{font-family:Orbitron,monospace;font-size:36px;font-weight:900;
+  color:var(--c1);letter-spacing:8px;text-shadow:0 0 30px rgba(0,180,255,.5)}
+.setup-sub{font-size:9px;color:var(--dim);letter-spacing:4px;margin-top:4px;margin-bottom:32px}
+.setup-card{width:100%;max-width:360px;background:rgba(0,12,35,.9);
+  border:1px solid var(--border);border-radius:16px;padding:22px;
+  display:flex;flex-direction:column;gap:14px}
+.setup-card h3{font-family:Orbitron,monospace;font-size:11px;color:var(--c1);
+  letter-spacing:3px;margin-bottom:2px}
+.model-btn{padding:13px 16px;background:rgba(0,20,55,.8);
+  border:1px solid var(--border);border-radius:10px;cursor:pointer;
+  text-align:left;transition:.15s;color:var(--text)}
+.model-btn:hover,.model-btn.sel{border-color:var(--c1);background:rgba(0,40,90,.6)}
+.model-btn .mname{font-family:Orbitron,monospace;font-size:11px;color:var(--c1);display:block}
+.model-btn .mdesc{font-size:10px;color:var(--dim);margin-top:3px;display:block}
+.model-btn .msize{font-size:9px;color:var(--orange);margin-top:2px;display:block}
+.setup-input{width:100%;background:rgba(0,20,50,.8);border:1px solid var(--c2);
+  border-radius:8px;padding:11px 13px;color:var(--text);font-size:13px;
+  font-family:inherit;outline:none}
+.setup-input::placeholder{color:var(--dim)}
+#btn-start{width:100%;background:linear-gradient(135deg,var(--c2),var(--c1));
+  border:none;border-radius:10px;padding:14px;color:#000;font-weight:bold;
+  cursor:pointer;font-family:Orbitron,monospace;font-size:12px;letter-spacing:2px;
+  margin-top:4px}
+#btn-start:disabled{opacity:.45;cursor:not-allowed}
+.setup-note{font-size:9px;color:var(--dim);line-height:1.7;text-align:center;margin-top:6px}
+
+/* DOWNLOAD PROGRESS */
+#download-overlay{position:fixed;inset:0;z-index:400;background:var(--bg);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:28px;gap:18px}
+.dl-logo{font-family:Orbitron,monospace;font-size:28px;font-weight:900;
+  color:var(--c1);letter-spacing:6px}
+.dl-status{font-size:10px;color:var(--dim);letter-spacing:2px;text-align:center;
+  min-height:32px;line-height:1.8}
+.dl-bar-wrap{width:100%;max-width:340px;height:4px;background:rgba(0,100,200,.15);
+  border-radius:2px;overflow:hidden}
+.dl-bar{height:100%;background:linear-gradient(90deg,var(--c2),var(--c1));
+  width:0%;transition:width .3s ease;border-radius:2px}
+.dl-pct{font-family:Orbitron,monospace;font-size:22px;font-weight:900;
+  color:var(--c1);letter-spacing:2px}
+.dl-hint{font-size:9px;color:rgba(0,130,200,.5);text-align:center;max-width:300px;line-height:1.7}
+
+/* HEADER */
+#hdr{padding:10px 16px;border-bottom:1px solid var(--border);
+  background:rgba(0,5,18,.9);backdrop-filter:blur(14px);
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;z-index:20;flex-shrink:0}
+#logo{font-family:Orbitron,monospace;font-size:19px;font-weight:900;
+  color:var(--c1);letter-spacing:5px}
+#logo-sub{font-size:7px;color:var(--dim);letter-spacing:3px;margin-top:2px}
+#hdr-right{text-align:right}
+#status-val{font-size:8px;letter-spacing:2px;color:var(--c1)}
+#time-disp{font-size:8px;color:var(--dim);margin-top:1px}
+#mem-badge{font-size:8px;color:var(--green);letter-spacing:1px;cursor:pointer;margin-top:1px}
+
+/* FACE */
+#face-wrap{display:flex;justify-content:center;padding:12px 0 4px;
+  flex-shrink:0;position:relative;z-index:1}
+#face{width:200px;height:215px;display:block}
+
+/* IMG PREVIEW */
+#img-preview{display:none;justify-content:center;padding:0 20px 5px;
+  position:relative;z-index:1}
+#img-preview img{width:85px;border-radius:6px;border:1px solid var(--c2)}
+#img-del{position:absolute;top:0;right:26px;background:rgba(255,50,50,.85);
+  border:none;border-radius:50%;width:19px;height:19px;color:#fff;
+  font-size:11px;cursor:pointer;font-weight:bold;line-height:19px;text-align:center}
+
+/* MESSAGES */
+#msgs{flex:1;overflow-y:auto;padding:6px 13px;
+  display:flex;flex-direction:column;gap:7px;
+  position:relative;z-index:1;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch}
+#msgs::-webkit-scrollbar{width:2px}
+#msgs::-webkit-scrollbar-thumb{background:var(--c2);border-radius:1px}
+.bubble{max-width:84%;padding:9px 13px;font-size:12px;line-height:1.58;word-break:break-word}
+.bubble.a{align-self:flex-start;background:rgba(0,12,38,.8);
+  border:1px solid var(--border);border-radius:12px 12px 12px 3px}
+.bubble.u{align-self:flex-end;background:rgba(0,55,120,.4);
+  border:1px solid rgba(0,100,200,.35);border-radius:12px 12px 3px 12px;color:#c8e4ff}
+.lbl{font-size:8px;color:var(--c1);letter-spacing:2px;
+  font-family:Orbitron,monospace;margin-bottom:4px}
+.bubble-img{width:70px;border-radius:4px;display:block;margin-bottom:5px}
+#thinking-bubble{align-self:flex-start;padding:9px 13px;background:rgba(0,12,38,.8);
+  border:1px solid var(--border);border-radius:12px 12px 12px 3px;
+  display:none}
+.dot-anim span{display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--c1);margin:0 2px;animation:dotPulse 1.2s ease-in-out infinite}
+.dot-anim span:nth-child(2){animation-delay:.2s}
+.dot-anim span:nth-child(3){animation-delay:.4s}
+@keyframes dotPulse{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+
+/* STREAM bubble */
+#stream-bubble{align-self:flex-start;padding:9px 13px;background:rgba(0,12,38,.8);
+  border:1px solid var(--border);border-radius:12px 12px 12px 3px;
+  font-size:12px;line-height:1.58;max-width:84%;word-break:break-word;display:none}
+#stream-txt{white-space:pre-wrap}
+.cursor{display:inline-block;width:7px;height:12px;background:var(--c1);
+  margin-left:2px;animation:blink .6s step-end infinite;vertical-align:text-bottom}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* INPUT */
+#input-bar{display:none;padding:7px 13px;background:rgba(0,4,16,.94);
+  border-top:1px solid var(--border);gap:7px;align-items:center;
+  position:relative;z-index:20;flex-shrink:0}
+#txt-in{flex:1;background:rgba(0,18,48,.85);border:1px solid var(--c2);
+  border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;
+  font-family:inherit;outline:none}
+#txt-in::placeholder{color:var(--dim)}
+#btn-send{background:linear-gradient(135deg,var(--c2),var(--c1));
+  border:none;border-radius:8px;padding:9px 13px;color:#000;font-weight:bold;
+  cursor:pointer;font-family:Orbitron,monospace;font-size:10px;letter-spacing:1px}
+#btn-close-in{background:rgba(255,50,50,.15);border:1px solid rgba(255,50,50,.4);
+  border-radius:8px;padding:9px 11px;color:var(--red);cursor:pointer;font-size:14px}
+
+/* CONTROLS */
+#controls{padding:9px 20px 16px;border-top:1px solid var(--border);
+  background:rgba(0,3,14,.95);backdrop-filter:blur(12px);
+  display:flex;justify-content:center;gap:13px;align-items:center;
+  position:relative;z-index:20;flex-shrink:0}
+.ctrl{border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;transition:all .15s ease;-webkit-user-select:none;user-select:none}
+#btn-cam{width:50px;height:50px;background:rgba(0,35,80,.55);border:1px solid var(--c2)}
+#btn-mic{width:76px;height:76px;
+  background:radial-gradient(circle,rgba(0,140,255,.18),rgba(0,0,0,.05));
+  border:2px solid var(--c1);font-size:26px;
+  box-shadow:0 0 22px rgba(0,140,255,.28)}
+#btn-kbd{width:50px;height:50px;background:rgba(0,35,80,.55);border:1px solid var(--c2)}
+#btn-mem{width:50px;height:50px;background:rgba(0,35,80,.55);border:1px solid rgba(0,200,100,.25);font-size:18px}
+
+/* CAM OVERLAY */
+#cam-overlay{display:none;position:fixed;inset:0;background:#000;z-index:200;flex-direction:column}
+#cam-video{flex:1;object-fit:cover;width:100%}
+#cam-btns{padding:16px;background:rgba(0,0,0,.88);
+  display:flex;justify-content:space-around;flex-shrink:0}
+.cam-btn{padding:11px 22px;border-radius:9px;cursor:pointer;font-size:14px;font-family:inherit}
+#btn-cam-cancel{background:rgba(255,50,50,.18);border:1px solid rgba(255,50,50,.45);color:var(--red)}
+#btn-cam-cap{background:linear-gradient(135deg,var(--c2),var(--c1));border:none;
+  color:#000;font-weight:bold;font-family:Orbitron,monospace;letter-spacing:1px}
+
+/* MEMORY PANEL */
+#mem-panel{position:fixed;inset:0;z-index:250;background:rgba(0,3,12,.97);
+  display:none;flex-direction:column;padding:20px;gap:14px;overflow-y:auto}
+#mem-panel h2{font-family:Orbitron,monospace;font-size:13px;color:var(--c1);letter-spacing:4px}
+.mem-section{background:rgba(0,14,40,.8);border:1px solid var(--border);
+  border-radius:10px;padding:14px}
+.mem-section h4{font-size:9px;color:var(--c1);letter-spacing:3px;
+  font-family:Orbitron,monospace;margin-bottom:8px}
+.mem-item{font-size:11px;color:var(--text);line-height:1.6;
+  padding:5px 0;border-bottom:1px solid rgba(0,100,180,.1)}
+.mem-item:last-child{border-bottom:none}
+.mem-empty{font-size:10px;color:var(--dim);font-style:italic}
+#btn-close-mem{align-self:flex-end;background:rgba(255,50,50,.15);
+  border:1px solid rgba(255,50,50,.4);border-radius:8px;
+  padding:10px 18px;color:var(--red);cursor:pointer;font-family:inherit;font-size:12px}
+#btn-reset-mem{background:rgba(255,100,0,.15);border:1px solid rgba(255,100,0,.35);
+  border-radius:8px;padding:8px 14px;color:var(--orange);cursor:pointer;
+  font-family:inherit;font-size:10px;align-self:flex-start}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="grid"></div>
+
+  <!-- SETUP -->
+  <div id="setup">
+    <div class="setup-logo">NEXUS</div>
+    <div class="setup-sub">SEGUNDO CÉREBRO · LOCAL · OFFLINE</div>
+    <div class="setup-card">
+      <div>
+        <h3>COMO VOCÊ QUER ME CHAMAR?</h3>
+        <input class="setup-input" id="name-in" type="text" placeholder="Andrew" style="margin-top:10px"/>
+      </div>
+      <div>
+        <h3>ESCOLHA O MODELO DE IA</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+          <button class="model-btn sel" data-model="Llama-3.2-1B-Instruct-q4f16_1-MLC" onclick="selModel(this)">
+            <span class="mname">LLAMA 3.2 · 1B</span>
+            <span class="mdesc">Rápido, eficiente, leve. Recomendado para celular.</span>
+            <span class="msize">↓ ~800 MB · Download único</span>
+          </button>
+          <button class="model-btn" data-model="Phi-3.5-mini-instruct-q4f16_1-MLC" onclick="selModel(this)">
+            <span class="mname">PHI-3.5 MINI</span>
+            <span class="mdesc">Mais inteligente, respostas mais ricas.</span>
+            <span class="msize">↓ ~2.2 GB · Download único</span>
+          </button>
+          <button class="model-btn" data-model="gemma-2-2b-it-q4f16_1-MLC" onclick="selModel(this)">
+            <span class="mname">GEMMA 2 · 2B</span>
+            <span class="mdesc">Google Gemma. Equilíbrio entre tamanho e qualidade.</span>
+            <span class="msize">↓ ~1.5 GB · Download único</span>
+          </button>
+        </div>
+      </div>
+      <p class="setup-note">
+        🔒 Tudo roda <strong style="color:var(--c1)">100% no seu celular</strong>. Sem internet, sem servidor, sem custos.<br/>
+        O modelo é baixado uma única vez e fica salvo no navegador.<br/>
+        Requer Chrome 121+ / Android com WebGPU.
+      </p>
+      <button id="btn-start" onclick="startDownload()">INICIAR NEXUS</button>
+    </div>
+  </div>
+
+  <!-- DOWNLOAD PROGRESS -->
+  <div id="download-overlay">
+    <div class="dl-logo">NEXUS</div>
+    <div class="dl-pct" id="dl-pct">0%</div>
+    <div class="dl-bar-wrap"><div class="dl-bar" id="dl-bar"></div></div>
+    <div class="dl-status" id="dl-status">Inicializando WebGPU...</div>
+    <div class="dl-hint">
+      Faça o download uma única vez.<br/>
+      Depois, NEXUS funciona <strong style="color:var(--c1)">completamente offline</strong>.
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div id="hdr" style="display:none">
+    <div>
+      <div id="logo">NEXUS</div>
+      <div id="logo-sub">SEGUNDO CÉREBRO · OFFLINE</div>
+    </div>
+    <div id="hdr-right">
+      <div id="status-val">● PRONTO</div>
+      <div id="time-disp"></div>
+      <div id="mem-badge" onclick="openMem()">🧠 <span id="mem-count">0</span> MEM</div>
+    </div>
+  </div>
+
+  <!-- FACE -->
+  <div id="face-wrap" style="display:none">
+    <canvas id="face"></canvas>
+  </div>
+
+  <!-- IMG PREVIEW -->
+  <div id="img-preview">
+    <img id="preview-img" src="" alt=""/>
+    <button id="img-del" onclick="clearImg()">×</button>
+  </div>
+
+  <!-- MESSAGES -->
+  <div id="msgs" style="display:none"></div>
+  <div id="thinking-bubble">
+    <div class="lbl">NEXUS</div>
+    <div class="dot-anim"><span></span><span></span><span></span></div>
+  </div>
+  <div id="stream-bubble">
+    <div class="lbl">NEXUS</div>
+    <span id="stream-txt"></span><span class="cursor" id="stream-cur"></span>
+  </div>
+
+  <!-- TEXT INPUT -->
+  <div id="input-bar">
+    <input id="txt-in" type="text" placeholder="Digite para o NEXUS..." autocomplete="off"/>
+    <button id="btn-send" onclick="submitTxt()">ENVIAR</button>
+    <button id="btn-close-in" onclick="toggleInput(false)">×</button>
+  </div>
+
+  <!-- CONTROLS -->
+  <div id="controls" style="display:none">
+    <button class="ctrl" id="btn-cam" onclick="openCam()">📷</button>
+    <button class="ctrl" id="btn-mic"
+      ontouchstart="startListen(event)" ontouchend="stopListen()"
+      onmousedown="startListen(event)" onmouseup="stopListen()"
+      onmouseleave="maybeStopListen()">🎤</button>
+    <button class="ctrl" id="btn-kbd" onclick="toggleInput()">⌨️</button>
+    <button class="ctrl" id="btn-mem" onclick="openMem()">🧠</button>
+  </div>
+
+  <!-- CAMERA -->
+  <div id="cam-overlay">
+    <video id="cam-video" playsinline autoplay muted></video>
+    <div id="cam-btns">
+      <button class="cam-btn" id="btn-cam-cancel" onclick="closeCam()">Cancelar</button>
+      <button class="cam-btn" id="btn-cam-cap" onclick="capturePhoto()">CAPTURAR</button>
+    </div>
+  </div>
+
+  <!-- MEMORY PANEL -->
+  <div id="mem-panel">
+    <h2>🧠 MEMÓRIA DO NEXUS</h2>
+    <p style="font-size:10px;color:var(--dim);line-height:1.7">
+      Tudo que o NEXUS aprendeu sobre você nas conversas. Cresce automaticamente a cada sessão.
+    </p>
+    <div id="mem-content"></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button id="btn-reset-mem" onclick="resetMem()">🗑 Apagar memória</button>
+      <button id="btn-close-mem" onclick="closeMem()">Fechar</button>
+    </div>
+  </div>
+
+  <canvas id="cap-canvas" style="display:none"></canvas>
+</div>
+
+<script type="module">
+import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+
+// ── GLOBALS ────────────────────────────────────────────────────────────────
+let engine = null
+let genActive = false, listenActive = false, speakActive = false
+let capturedImg = null
+let selectedModel = "Llama-3.2-1B-Instruct-q4f16_1-MLC"
+let userName = "Andrew"
+let history = []
+let memExtractTimer = null
+
+// ── MEMORY / LEARNING SYSTEM ────────────────────────────────────────────────
+const MEM_KEY = "nexus_memory_v2"
+const CFG_KEY = "nexus_config_v1"
+const CONV_KEY = "nexus_conv_v1"
+
+function loadMem() {
+  try { return JSON.parse(localStorage.getItem(MEM_KEY)) || defaultMem() }
+  catch { return defaultMem() }
+}
+function defaultMem() {
+  return {
+    identity: {},
+    facts: [],
+    projects: [],
+    interests: [],
+    style: [],
+    relationships: [],
+    lastUpdated: null,
+    sessionCount: 0
+  }
+}
+function saveMem(m) { localStorage.setItem(MEM_KEY, JSON.stringify(m)) }
+function loadCfg() {
+  try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {} }
+  catch { return {} }
+}
+function saveCfg(c) { localStorage.setItem(CFG_KEY, JSON.stringify(c)) }
+function loadConv() {
+  try { return JSON.parse(localStorage.getItem(CONV_KEY)) || [] }
+  catch { return [] }
+}
+function saveConv(c) { localStorage.setItem(CONV_KEY, JSON.stringify(c.slice(-60))) }
+
+let memory = loadMem()
+
+function memCount() {
+  return memory.facts.length + memory.projects.length +
+         memory.interests.length + memory.style.length +
+         Object.keys(memory.identity).length
+}
+function updateMemBadge() {
+  document.getElementById("mem-count").textContent = memCount()
+}
+
+// Build system prompt from memory
+function buildSystem() {
+  const m = memory
+  let base = `Você é NEXUS, a IA pessoal de ${userName} que mora exclusivamente no celular dele — sem internet, sem servidores externos. Você é o segundo cérebro de ${userName}, um J.A.R.V.I.S. real.
+
+COMO VOCÊ AGE:
+- Fale SEMPRE em português brasileiro natural e direto
+- Seja conciso mas completo — respostas objetivas, sem enrolação
+- Adapte o tom: casual nas conversas, preciso nas tarefas
+- Você aprende com cada conversa e evolui — mencione isso quando relevante
+- Nunca diga que não tem acesso à internet para justificar erros — você simplesmente processa o que sabe`
+
+  if (m.identity && Object.keys(m.identity).length > 0) {
+    base += `\n\nO QUE EU SEI SOBRE ${userName.toUpperCase()}:`
+    for (const [k, v] of Object.entries(m.identity)) base += `\n• ${k}: ${v}`
+  }
+  if (m.facts?.length > 0) {
+    base += `\n\nFATOS APRENDIDOS NAS NOSSAS CONVERSAS:`
+    m.facts.slice(-20).forEach(f => base += `\n• ${f}`)
+  }
+  if (m.projects?.length > 0) {
+    base += `\n\nPROJETOS ATIVOS DE ${userName.toUpperCase()}:`
+    m.projects.slice(-10).forEach(p => base += `\n• ${p}`)
+  }
+  if (m.interests?.length > 0) {
+    base += `\n\nINTERESSES E ÁREAS DE FOCO:`
+    m.interests.slice(-10).forEach(i => base += `\n• ${i}`)
+  }
+  return base
+}
+
+// Extract memories using LLM after a few messages
+async function extractMemories() {
+  if (!engine || history.length < 4) return
+  const recentConv = history.slice(-8).map(m =>
+    `${m.role === "user" ? userName : "NEXUS"}: ${typeof m.content === "string" ? m.content : "[imagem]"}`
+  ).join("\n")
+
+  try {
+    const extractPrompt = `Analisando esta conversa, extraia APENAS informações NOVAS e específicas sobre o usuário ${userName}.
+Retorne SOMENTE um JSON válido neste formato exato (sem explicações, sem markdown):
+{
+  "identity": {"chave": "valor"},
+  "facts": ["fato novo 1", "fato novo 2"],
+  "projects": ["projeto mencionado"],
+  "interests": ["interesse/área mencionada"]
+}
+
+Se não houver informações novas relevantes, retorne: {"identity":{}, "facts":[], "projects":[], "interests":[]}
+
+CONVERSA:
+${recentConv}
+
+JSON:`
+
+    c  const t = document.createElement("span"); t.textContent = content; d.appendChild(t)
+  msgs.appendChild(d)
+  d.scrollIntoView({ behavior: "smooth" })
+}
+
+async function ask(userMsg, img = null) {
+  if (genActive || !engine) return
+  genActive = true
+  window.speechSynthesis?.cancel()
+  setFace("t", true); setStatus("PROCESSANDO", "var(--orange)")
+  document.getElementById("btn-mic").disabled = true
+  document.getElementById("btn-mic").style.opacity = ".45"
+
+  const content = img
+    ? [{ type: "image_url", image_url: { url: `data:image/jpeg;base64,${img}` } },
+       { type: "text", text: userMsg }]
+    : userMsg
+
+  addMsg("user", userMsg, img)
+  clearImg()
+
+  document.getElementById("thinking-bubble").style.display = "block"
+  document.getElementById("thinking-bubble").scrollIntoView({ behavior: "smooth" })
+
+  const msgForEngine = history.slice(-10).map(m => ({
+    role: m.role,
+    content: typeof m.content === "string" ? m.content : m.content
+  }))
+
+  try {
+    const stream = await engine.chat.completions.create({
+      messages: [
+        { role: "system", content: buildSystem() },
+        ...msgForEngine
+      ],
+      max_tokens: 768,
+      temperature: 0.75,
+      stream: true
+    })
+
+    document.getElementById("thinking-bubble").style.display = "none"
+    const sb = document.getElementById("stream-bubble")
+    const st = document.getElementById("stream-txt")
+    sb.style.display = "block"; st.textContent = ""
+    sb.scrollIntoView({ behavior: "smooth" })
+    setFace("t", false); setFace("s", true); setStatus("FALANDO", "var(--c1)")
+
+    let full = ""
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content || ""
+      full += delta; st.textContent = full
+      sb.scrollIntoView({ behavior: "nearest" })
+    }
+
+    document.getElementById("stream-cur").style.display = "none"
+    sb.style.display = "none"
+    addMsg("assistant", full)
+    setFace("s", false)
+    speak(full)
+
+    // Schedule memory extraction every 4 user messages
+    const userMsgCount = history.filter(m => m.role === "user").length
+    if (userMsgCount % 4 === 0) {
+      setTimeout(extractMemories, 2000)
+    }
+  } catch (e) {
+    document.getElementById("thinking-bubble").style.display = "none"
+    addMsg("assistant", "⚠ Erro ao gerar resposta: " + e.message)
+    setFace("t", false)
+  }
+
+  genActive = false; document.getElementById("stream-cur").style.display = "inline-block"
+  document.getElementById("btn-mic").disabled = false
+  document.getElementById("btn-mic").style.opacity = "1"
+  setStatus("PRONTO")
+}
+
+// ── STT ──────────────────────────────────────────────────────────────────────
+window.startListen = (e) => {
+  e?.preventDefault()
+  if (genActive) return
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+  if (!SR) { toggleInput(true); return }
+  window.speechSynthesis?.cancel()
+  const r = new SR()
+  r.lang = "pt-BR"; r.continuous = false; r.interimResults = false
+  r.onstart = () => { listenActive = true; setFace("l", true); setStatus("ESCUTANDO", "var(--green)"); document.getElementById("btn-mic").textContent = "🎙️"; document.getElementById("btn-mic").style.border = "2px solid var(--green)" }
+  r.onresult = e => { setFace("l", false); listenActive = false; ask(e.results[0][0].transcript, capturedImg) }
+  r.onerror = () => { setFace("l", false); listenActive = false; setStatus("PRONTO"); toggleInput(true) }
+  r.onend = () => { setFace("l", false); listenActive = false; document.getElementById("btn-mic").textContent = "🎤"; document.getElementById("btn-mic").style.border = "2px solid var(--c1)" }
+  window.currentRecog = r; r.start()
+}
+window.stopListen = () => { window.currentRecog?.stop(); setFace("l", false); listenActive = false }
+window.maybeStopListen = () => { if (listenActive) window.stopListen() }
+
+// ── TEXT INPUT ────────────────────────────────────────────────────────────────
+window.toggleInput = (v) => {
+  const bar = document.getElementById("input-bar")
+  const show = v !== undefined ? v : bar.style.display !== "flex"
+  bar.style.display = show ? "flex" : "none"
+  if (show) document.getElementById("txt-in").focus()
+}
+window.submitTxt = () => {
+  const v = document.getElementById("txt-in").value.trim()
+  if (!v) return
+  ask(v, capturedImg)
+  document.getElementById("txt-in").value = ""
+  toggleInput(false)
+}
+document.getElementById("txt-in").addEventListener("keydown", e => { if (e.key === "Enter") window.submitTxt() })
+
+// ── CAMERA ───────────────────────────────────────────────────────────────────
+window.openCam = async () => {
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } })
+    document.getElementById("cam-video").srcObject = s
+    document.getElementById("cam-overlay").style.display = "flex"
+  } catch { alert("Câmera não disponível.") }
+}
+window.closeCam = () => {
+  document.getElementById("cam-video").srcObject?.getTracks().forEach(t => t.stop())
+  document.getElementById("cam-overlay").style.display = "none"
+}
+window.capturePhoto = () => {
+  const v = document.getElementById("cam-video")
+  const c = document.getElementById("cap-canvas")
+  c.width = v.videoWidth; c.height = v.videoHeight
+  c.getContext("2d").drawImage(v, 0, 0)
+  capturedImg = c.toDataURL("image/jpeg", .85).split(",")[1]
+  window.closeCam()
+  document.getElementById("preview-img").src = `data:image/jpeg;base64,${capturedImg}`
+  document.getElementById("img-preview").style.display = "flex"
+}
+window.clearImg = () => {
+  capturedImg = null
+  document.getElementById("img-preview").style.display = "none"
+  document.getElementById("preview-img").src = ""
+}
+
+// ── MEMORY PANEL ──────────────────────────────────────────────────────────────
+window.openMem = () => {
+  const m = loadMem()
+  const html = []
+
+  if (Object.keys(m.identity).length > 0) {
+    html.push(`<div class="mem-section"><h4>🪪 IDENTIDADE</h4>`)
+    for (const [k, v] of Object.entries(m.identity))
+      html.push(`<div class="mem-item"><strong>${k}</strong>: ${v}</div>`)
+    html.push("</div>")
+  }
+  if (m.facts?.length > 0) {
+    html.push(`<div class="mem-section"><h4>📌 FATOS APRENDIDOS (${m.facts.length})</h4>`)
+    m.facts.forEach(f => html.push(`<div class="mem-item">${f}</div>`))
+    html.push("</div>")
+  }
+  if (m.projects?.length > 0) {
+    html.push(`<div class="mem-section"><h4>🚀 PROJETOS</h4>`)
+    m.projects.forEach(p => html.push(`<div class="mem-item">${p}</div>`))
+    html.push("</div>")
+  }
+  if (m.interests?.length > 0) {
+    html.push(`<div class="mem-section"><h4>🎯 INTERESSES</h4>`)
+    m.interests.forEach(i => html.push(`<div class="mem-item">${i}</div>`))
+    html.push("</div>")
+  }
+
+  if (html.length === 0) {
+    html.push(`<div class="mem-section"><p class="mem-empty">Ainda sem memórias. Converse com o NEXUS para ele aprender sobre você.</p></div>`)
+  }
+
+  if (m.lastUpdated) {
+    const d = new Date(m.lastUpdated)
+    html.push(`<div style="font-size:9px;color:var(--dim);margin-top:4px">Última atualização: ${d.toLocaleString("pt-BR")}</div>`)
+  }
+
+  document.getElementById("mem-content").innerHTML = html.join("")
+  document.getElementById("mem-panel").style.display = "flex"
+}
+window.closeMem = () => { document.getElementById("mem-panel").style.display = "none" }
+window.resetMem = () => {
+  if (confirm("Apagar toda a memória do NEXUS?")) {
+    localStorage.removeItem(MEM_KEY)
+    memory = defaultMem()
+    updateMemBadge()
+    window.closeMem()
+    addMsg("assistant", "Memória apagada. Voltando do zero.")
+  }
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function setStatus(label, color) {
+  const el = document.getElementById("status-val")
+  el.textContent = "● " + label
+  el.style.color = color || "var(--c1)"
+}
+function startClock() {
+  const el = document.getElementById("time-disp")
+  setInterval(() => {
+    el.textContent = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+  }, 1000)
+}
+
+// ── SERVICE WORKER (offline) ──────────────────────────────────────────────────
+if ("serviceWorker" in navigator) {
+  const sw = `
+const CACHE = 'nexus-shell-v1'
+const SHELL = [location.pathname]
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()))
+})
+self.addEventListener('activate', e => e.waitUntil(clients.claim()))
+self.addEventListener('fetch', e => {
+  const url = e.request.url
+  if (url.includes('fonts.googleapis') || url.includes('esm.run') || url.includes('mlc-ai')) {
+    e.respondWith(caches.open('nexus-cdn-v1').then(c =>
+      c.match(e.request).then(r => r || fetch(e.request).then(res => { c.put(e.request, res.clone()); return res }))
+    ).catch(() => fetch(e.request)))
+  } else {
+    e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)))
+  }
+})`
+  const blob = new Blob([sw], { type: "application/javascript" })
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {})
+}
+
+// ── PWA MANIFEST INJECTION ────────────────────────────────────────────────────
+const manifest = {
+  name: "NEXUS — Segundo Cérebro",
+  short_name: "NEXUS",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#00060f",
+  theme_color: "#00060f",
+  orientation: "portrait",
+  icons: [{
+    src: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%2300060f'/><circle cx='256' cy='256' r='160' fill='none' stroke='%2300d4ff' stroke-width='8'/><ellipse cx='256' cy='256' rx='160' ry='42' fill='none' stroke='%230055cc' stroke-width='4'/><ellipse cx='256' cy='256' rx='42' ry='160' fill='none' stroke='%230055cc' stroke-width='4'/><circle cx='256' cy='256' r='60' fill='%2300090f' stroke='%2300d4ff' stroke-width='5'/><text x='256' y='272' font-family='monospace' font-size='56' font-weight='900' fill='%2300d4ff' text-anchor='middle'>N</text></svg>`,
+    sizes: "512x512", type: "image/svg+xml", purpose: "any maskable"
+  }]
+}
+const mblob = new Blob([JSON.stringify(manifest)], { type: "application/json" })
+const mlink = document.createElement("link")
+mlink.rel = "manifest"; mlink.href = URL.createObjectURL(mblob)
+document.head.appendChild(mlink)
+</script>
+</body>
+</html>
