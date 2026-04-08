@@ -559,15 +559,18 @@ function showError(err) {
 
   const fixes = []
 
-  if (msg.includes("webgpu") || msg.includes("gpu") || msg.includes("adapter") || msg.includes("device")) {
-    fixes.push({ t: "WebGPU não suportado", d: "Seu Chrome pode estar desatualizado. Atualize para <strong>Chrome 121+</strong> em chrome://settings." })
-    fixes.push({ t: "Ativar WebGPU", d: "Acesse <strong>chrome://flags</strong> → busque \"WebGPU\" → Ativar → Reiniciar." })
-    fixes.push({ t: "Dispositivo incompatível", d: "Alguns celulares mais antigos não suportam WebGPU. Tente no modo PC." })
+  if (msg.includes("instance reference") || msg.includes("instance no longer") || msg.includes("external instance")) {
+    fixes.push({ t: "⚠ GPU perdeu o contexto", d: "O Android destruiu o WebGPU porque a <strong>tela apagou ou você minimizou o Chrome</strong> durante o carregamento. O modelo já foi baixado — só recarregar." })
+    fixes.push({ t: "Como resolver agora", d: "Toque em <strong>Tentar Novamente</strong>, mantenha a tela acesa e <strong>não saia do Chrome</strong> até aparecer a face do NEXUS." })
+    fixes.push({ t: "Dica", d: "Ative <strong>Não Perturbe</strong> e deixe o brilho no máximo pra tela não apagar sozinha." })
+  } else if (msg.includes("webgpu") || msg.includes("adapter") || (msg.includes("gpu") && !msg.includes("instance"))) {
+    fixes.push({ t: "WebGPU não suportado", d: "Atualize para <strong>Chrome 121+</strong> em chrome://settings." })
+    fixes.push({ t: "Ativar WebGPU", d: "Chrome → <strong>chrome://flags</strong> → busque WebGPU → Ativar → Reiniciar." })
   } else if (msg.includes("network") || msg.includes("fetch") || msg.includes("failed to fetch") || msg.includes("net::")) {
     fixes.push({ t: "Sem conexão", d: "O <strong>primeiro download</strong> exige internet. Conecte ao Wi-Fi e tente novamente." })
-    fixes.push({ t: "Bloqueado por rede", d: "Algumas redes corporativas bloqueiam CDNs. Tente pelo <strong>4G/dados móveis</strong>." })
+    fixes.push({ t: "Bloqueado por rede", d: "Tente pelo <strong>4G/dados móveis</strong> se estiver em rede corporativa." })
   } else if (msg.includes("memory") || msg.includes("out of memory") || msg.includes("oom")) {
-    fixes.push({ t: "Memória insuficiente", d: "Feche outros apps e abas abertas. Tente o modelo <strong>Llama 1B</strong> (menor)." })
+    fixes.push({ t: "Memória insuficiente", d: "Feche todos os outros apps e abas. Tente o modelo <strong>Llama 1B</strong> (menor)." })
     fixes.push({ t: "Reiniciar Chrome", d: "Feche e reabra o Chrome completamente antes de tentar novamente." })
   } else if (msg.includes("storage") || msg.includes("quota") || msg.includes("indexeddb")) {
     fixes.push({ t: "Espaço em disco", d: "Libere espaço no celular. O modelo precisa de <strong>~1–2 GB livres</strong>." })
@@ -575,8 +578,8 @@ function showError(err) {
   } else if (msg.includes("cors") || msg.includes("cross-origin")) {
     fixes.push({ t: "Erro de CORS", d: "Acesse via <strong>HTTPS</strong> (GitHub Pages já usa). Não abra o arquivo HTML diretamente." })
   } else {
-    fixes.push({ t: "Erro desconhecido", d: `<code style="font-size:9px;color:#ff8888">${err?.message || err}</code>` })
-    fixes.push({ t: "Solução geral", d: "Atualize o Chrome, libere memória, conecte ao Wi-Fi e tente novamente." })
+    fixes.push({ t: "Erro", d: `<code style="font-size:9px;color:#ff8888">${err?.message || err}</code>` })
+    fixes.push({ t: "Solução geral", d: "Mantenha a tela acesa, não minimize o Chrome, e tente novamente." })
   }
 
   tips.innerHTML = fixes.map(f =>
@@ -585,12 +588,25 @@ function showError(err) {
 
   tlog("❌ " + (err?.message || err), "err")
   tlog("Veja as dicas de correção abaixo ↓", "warn")
-  setPhase(currentPhase) // freeze current phase as active (error state)
+  setPhase(currentPhase)
   document.getElementById("dl-phase").textContent = "ERRO"
   document.getElementById("dl-phase").style.color = "var(--red)"
 }
 
 // ── START / DOWNLOAD ────────────────────────────────────────────────────────
+let wakeLock = null
+async function acquireWakeLock() {
+  try {
+    if ("wakeLock" in navigator) {
+      wakeLock = await navigator.wakeLock.request("screen")
+      tlog("✓ Tela bloqueada — não vai apagar durante o carregamento", "ok")
+    }
+  } catch { /* não crítico */ }
+}
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release(); wakeLock = null }
+}
+
 window.startDownload = async () => {
   const nameVal = document.getElementById("name-in").value.trim()
   if (nameVal) userName = nameVal
@@ -603,6 +619,7 @@ window.startDownload = async () => {
   document.getElementById("dl-terminal").innerHTML = ""
 
   tlog("NEXUS iniciando...", "info")
+  await acquireWakeLock()
 
   // Load WebLLM dynamically (only once)
   if (!webllm) {
@@ -681,9 +698,11 @@ window.startDownload = async () => {
     tlog("✓ Modelo carregado na GPU", "ok")
     tlog("✓ NEXUS pronto para operar", "ok")
     tlog("▶ Iniciando interface...", "info")
+    releaseWakeLock()
     await new Promise(r => setTimeout(r, 600))
     bootApp()
   } catch (e) {
+    releaseWakeLock()
     showError(e)
   }
 }
