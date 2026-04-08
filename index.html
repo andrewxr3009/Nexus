@@ -4,319 +4,678 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"/>
 <title>NEXUS</title>
-<meta name="theme-color" content="#00060f"/>
+<meta name="theme-color" content="#060d1a"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="NEXUS"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Display:wght@400;700&family=Roboto+Mono:wght@400;500&display=swap"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
 :root{
-  --c1:#00d4ff;--c2:#0055cc;--c3:#6040ff;
-  --bg:#00060f;--glass:rgba(0,14,40,.7);
-  --border:rgba(0,140,220,.18);--text:#b0d8f5;--dim:rgba(0,160,230,.45);
-  --green:#00ff88;--orange:#ffaa00;--red:#ff4444
+  /* M3 Seed: #00b4d8 */
+  --md-primary:#4fc3f7;
+  --md-on-primary:#003548;
+  --md-primary-container:#004d64;
+  --md-on-primary-container:#b3e5fc;
+  --md-secondary:#7cb3c8;
+  --md-secondary-container:#1a3a4a;
+  --md-surface:#0d1b2a;
+  --md-surface-1:#111f30;
+  --md-surface-2:#152435;
+  --md-surface-3:#1a2a3d;
+  --md-surface-4:#1e2f43;
+  --md-surface-5:#202f42;
+  --md-on-surface:#c8dff0;
+  --md-on-surface-variant:#8fafc4;
+  --md-outline:#2e4a60;
+  --md-outline-variant:#1e3448;
+  --md-error:#cf6679;
+  --md-bg:#060d1a;
+  --md-scrim:rgba(0,0,0,.6);
+
+  --radius-xs:8px;
+  --radius-s:12px;
+  --radius-m:16px;
+  --radius-l:24px;
+  --radius-xl:28px;
+  --radius-full:999px;
+
+  --elev1:0 1px 2px rgba(0,0,0,.3),0 1px 3px rgba(0,0,0,.15);
+  --elev2:0 1px 2px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.15);
+  --elev3:0 4px 8px rgba(0,0,0,.3),0 1px 3px rgba(0,0,0,.15);
+
+  --anim-std:cubic-bezier(0.2,0,0,1);
+  --anim-decel:cubic-bezier(0,0,0,1);
+  --anim-accel:cubic-bezier(0.3,0,1,1);
+
+  --accent: #4fc3f7;
+  --accent-glow: rgba(79,195,247,.18);
 }
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
-  font-family:'Share Tech Mono',monospace;touch-action:manipulation;
-  -webkit-overflow-scrolling:touch}
-#app{height:100%;height:100dvh;display:flex;flex-direction:column;position:relative}
 
-/* GRID BG */
-#grid{position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(0,140,220,.022) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(0,140,220,.022) 1px,transparent 1px);
-  background-size:40px 40px;animation:gridDrift 60s linear infinite}
-@keyframes gridDrift{0%{background-position:0 0}100%{background-position:40px 40px}}
+html,body{
+  height:100%;overflow:hidden;
+  background:var(--md-bg);
+  color:var(--md-on-surface);
+  font-family:'Google Sans',sans-serif;
+  touch-action:manipulation;
+  -webkit-overflow-scrolling:touch;
+}
+#app{height:100%;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden}
 
-/* SETUP SCREEN */
-#setup{position:fixed;inset:0;z-index:300;background:var(--bg);
+/* ── AMBIENT BACKGROUND ── */
+#ambient{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  overflow:hidden;
+}
+#ambient::before{
+  content:'';position:absolute;
+  width:500px;height:500px;border-radius:50%;
+  top:-120px;left:-100px;
+  background:radial-gradient(circle,rgba(0,100,180,.12),transparent 70%);
+  animation:ambientDrift 18s ease-in-out infinite alternate;
+}
+#ambient::after{
+  content:'';position:absolute;
+  width:400px;height:400px;border-radius:50%;
+  bottom:-80px;right:-80px;
+  background:radial-gradient(circle,rgba(0,60,120,.1),transparent 70%);
+  animation:ambientDrift 24s ease-in-out infinite alternate-reverse;
+}
+@keyframes ambientDrift{
+  from{transform:translate(0,0) scale(1)}
+  to{transform:translate(40px,30px) scale(1.15)}
+}
+
+/* ── SETUP SCREEN ── */
+#setup{
+  position:fixed;inset:0;z-index:300;background:var(--md-bg);
   display:none;flex-direction:column;align-items:center;justify-content:center;
-  padding:28px;gap:0}
-.setup-logo{font-family:Orbitron,monospace;font-size:36px;font-weight:900;
-  color:var(--c1);letter-spacing:8px;text-shadow:0 0 30px rgba(0,180,255,.5)}
-.setup-sub{font-size:9px;color:var(--dim);letter-spacing:4px;margin-top:4px;margin-bottom:32px}
-.setup-card{width:100%;max-width:360px;background:rgba(0,12,35,.9);
-  border:1px solid var(--border);border-radius:16px;padding:22px;
-  display:flex;flex-direction:column;gap:14px}
-.setup-card h3{font-family:Orbitron,monospace;font-size:11px;color:var(--c1);
-  letter-spacing:3px;margin-bottom:2px}
-.model-btn{padding:13px 16px;background:rgba(0,20,55,.8);
-  border:1px solid var(--border);border-radius:10px;cursor:pointer;
-  text-align:left;transition:.15s;color:var(--text)}
-.model-btn:hover,.model-btn.sel{border-color:var(--c1);background:rgba(0,40,90,.6)}
-.model-btn .mname{font-family:Orbitron,monospace;font-size:11px;color:var(--c1);display:block}
-.model-btn .mdesc{font-size:10px;color:var(--dim);margin-top:3px;display:block}
-.model-btn .msize{font-size:9px;color:var(--orange);margin-top:2px;display:block}
-.setup-input{width:100%;background:rgba(0,20,50,.8);border:1px solid var(--c2);
-  border-radius:8px;padding:11px 13px;color:var(--text);font-size:13px;
-  font-family:inherit;outline:none}
-.setup-input::placeholder{color:var(--dim)}
-#btn-start{width:100%;background:linear-gradient(135deg,var(--c2),var(--c1));
-  border:none;border-radius:10px;padding:14px;color:#000;font-weight:bold;
-  cursor:pointer;font-family:Orbitron,monospace;font-size:12px;letter-spacing:2px;
-  margin-top:4px}
-#btn-start:disabled{opacity:.45;cursor:not-allowed}
-.setup-note{font-size:9px;color:var(--dim);line-height:1.7;text-align:center;margin-top:6px}
+  padding:24px;gap:0;overflow-y:auto;
+}
+.setup-brand{text-align:center;margin-bottom:28px}
+.setup-logo{
+  font-family:'Google Sans Display',sans-serif;font-size:42px;font-weight:700;
+  color:var(--md-primary);letter-spacing:6px;
+  text-shadow:0 0 40px rgba(79,195,247,.35);
+}
+.setup-tagline{font-size:11px;color:var(--md-on-surface-variant);letter-spacing:3px;margin-top:6px}
 
-/* DOWNLOAD PROGRESS */
-#download-overlay{position:fixed;inset:0;z-index:400;background:var(--bg);
-  display:none;flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:28px 20px 20px;gap:14px;overflow-y:auto}
-.dl-logo{font-family:Orbitron,monospace;font-size:26px;font-weight:900;
-  color:var(--c1);letter-spacing:6px;margin-top:8px}
-.dl-phase{font-size:9px;color:var(--dim);letter-spacing:3px;text-align:center}
-.dl-pct{font-family:Orbitron,monospace;font-size:36px;font-weight:900;
-  color:var(--c1);letter-spacing:2px;line-height:1}
-/* Outer bar (total) */
-.dl-bar-wrap{width:100%;max-width:340px;height:6px;background:rgba(0,100,200,.12);
-  border-radius:3px;overflow:hidden;position:relative}
-.dl-bar{height:100%;background:linear-gradient(90deg,var(--c2),var(--c1));
-  width:0%;transition:width .25s ease;border-radius:3px}
-/* Shimmer on bar */
-.dl-bar::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
-  animation:shimmer 1.4s infinite}
-@keyframes shimmer{0%{left:-40%}100%{left:110%}}
+.m3-card{
+  width:100%;max-width:380px;
+  background:var(--md-surface-2);
+  border:1px solid var(--md-outline-variant);
+  border-radius:var(--radius-xl);
+  padding:24px;
+  display:flex;flex-direction:column;gap:20px;
+  box-shadow:var(--elev2);
+}
+.m3-label{
+  font-size:11px;font-weight:500;color:var(--md-secondary);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;
+}
+.m3-field{position:relative}
+.m3-input{
+  width:100%;
+  background:var(--md-surface-3);
+  border:1.5px solid var(--md-outline);
+  border-radius:var(--radius-m);
+  padding:14px 16px;
+  color:var(--md-on-surface);
+  font-size:15px;font-family:'Google Sans',sans-serif;
+  outline:none;transition:.2s var(--anim-std);
+}
+.m3-input:focus{border-color:var(--md-primary);background:var(--md-surface-4)}
+.m3-input::placeholder{color:var(--md-on-surface-variant)}
+
+.model-chips{display:flex;flex-direction:column;gap:8px}
+.model-chip{
+  padding:14px 16px;
+  background:var(--md-surface-3);
+  border:1.5px solid var(--md-outline-variant);
+  border-radius:var(--radius-l);
+  cursor:pointer;text-align:left;
+  transition:.2s var(--anim-std);
+  color:var(--md-on-surface);
+  position:relative;overflow:hidden;
+}
+.model-chip::before{
+  content:'';position:absolute;inset:0;
+  background:var(--accent-glow);opacity:0;
+  transition:.2s;
+}
+.model-chip:active::before,.model-chip.sel::before{opacity:1}
+.model-chip.sel{border-color:var(--md-primary);background:var(--md-primary-container)}
+.model-chip .chip-name{
+  font-size:13px;font-weight:600;color:var(--md-primary);
+  font-family:'Google Sans',sans-serif;
+}
+.model-chip.sel .chip-name{color:var(--md-on-primary-container)}
+.model-chip .chip-desc{font-size:11px;color:var(--md-on-surface-variant);margin-top:3px}
+.model-chip .chip-size{font-size:10px;color:var(--md-secondary);margin-top:4px;font-family:'Roboto Mono',monospace}
+.model-chip .chip-check{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-size:18px;opacity:0;transition:.2s;
+}
+.model-chip.sel .chip-check{opacity:1}
+
+.setup-note{
+  font-size:11px;color:var(--md-on-surface-variant);
+  line-height:1.8;text-align:center;
+  background:var(--md-surface-3);border-radius:var(--radius-m);
+  padding:12px;border:1px solid var(--md-outline-variant);
+}
+.setup-note strong{color:var(--md-primary)}
+
+#btn-start{
+  width:100%;
+  background:var(--md-primary);
+  border:none;border-radius:var(--radius-full);
+  padding:16px;color:var(--md-on-primary);
+  font-weight:700;font-family:'Google Sans',sans-serif;
+  font-size:14px;letter-spacing:0.5px;
+  cursor:pointer;transition:.2s var(--anim-std);
+  box-shadow:0 4px 20px rgba(79,195,247,.25);
+}
+#btn-start:hover{box-shadow:0 6px 28px rgba(79,195,247,.35);transform:translateY(-1px)}
+#btn-start:active{transform:translateY(0);box-shadow:none}
+#btn-start:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ── DOWNLOAD OVERLAY ── */
+#download-overlay{
+  position:fixed;inset:0;z-index:400;background:var(--md-bg);
+  display:none;flex-direction:column;align-items:center;
+  justify-content:flex-start;padding:60px 24px 24px;gap:16px;overflow-y:auto;
+}
+.dl-logo-wrap{text-align:center;margin-bottom:8px}
+.dl-logo{font-family:'Google Sans Display',sans-serif;font-size:32px;font-weight:700;color:var(--md-primary);letter-spacing:5px}
+.dl-status{font-size:11px;color:var(--md-on-surface-variant);letter-spacing:2px;margin-top:6px}
+
+/* Circular progress */
+.dl-circle-wrap{position:relative;width:140px;height:140px}
+.dl-circle-svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.dl-circle-bg{fill:none;stroke:var(--md-outline-variant);stroke-width:6}
+.dl-circle-prog{
+  fill:none;stroke:var(--md-primary);stroke-width:6;
+  stroke-linecap:round;stroke-dasharray:376;stroke-dashoffset:376;
+  transition:stroke-dashoffset .35s var(--anim-decel);
+}
+.dl-pct-inner{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.dl-pct{font-family:'Google Sans Display',sans-serif;font-size:30px;font-weight:700;color:var(--md-primary);line-height:1}
+.dl-pct-label{font-size:9px;color:var(--md-on-surface-variant);margin-top:4px;letter-spacing:1px}
+
 /* Phase steps */
-.dl-phases{display:flex;gap:6px;width:100%;max-width:340px;justify-content:space-between}
-.dl-step{flex:1;height:3px;border-radius:2px;background:rgba(0,100,200,.15);transition:.4s}
-.dl-step.done{background:var(--c1)}
-.dl-step.active{background:var(--orange);animation:stepPulse .7s ease-in-out infinite alternate}
+.dl-steps{display:flex;gap:6px;width:100%;max-width:320px}
+.dl-step{
+  flex:1;height:4px;border-radius:var(--radius-full);
+  background:var(--md-outline-variant);transition:.4s;
+}
+.dl-step.done{background:var(--md-primary)}
+.dl-step.active{background:var(--md-secondary);animation:stepPulse .8s ease-in-out infinite alternate}
 @keyframes stepPulse{from{opacity:.5}to{opacity:1}}
-/* Terminal */
-#dl-terminal{width:100%;max-width:340px;background:rgba(0,8,20,.9);
-  border:1px solid rgba(0,100,180,.2);border-radius:10px;
-  padding:12px 14px;font-size:11px;line-height:1.7;
-  max-height:200px;overflow-y:auto;flex-shrink:0}
-#dl-terminal::-webkit-scrollbar{width:2px}
-#dl-terminal::-webkit-scrollbar-thumb{background:var(--c2)}
-.tl{display:flex;gap:8px;align-items:flex-start}
-.tl-time{color:rgba(0,140,200,.5);flex-shrink:0;font-size:10px}
-.tl-msg{color:var(--text);word-break:break-word}
-.tl-msg.ok{color:var(--green)}
-.tl-msg.err{color:var(--red)}
-.tl-msg.warn{color:var(--orange)}
-.tl-msg.info{color:var(--c1)}
-/* Error box */
-#dl-error-box{display:none;width:100%;max-width:340px;background:rgba(40,0,0,.7);
-  border:1px solid rgba(200,50,50,.35);border-radius:10px;padding:14px;
-  font-size:11px;line-height:1.75;color:#ffaaaa}
-#dl-error-box h4{font-family:Orbitron,monospace;font-size:10px;color:var(--red);
-  letter-spacing:2px;margin-bottom:8px}
-.err-fix{padding:6px 0;border-bottom:1px solid rgba(200,50,50,.15)}
+.dl-phase-name{font-size:12px;color:var(--md-on-surface-variant);font-weight:500}
+
+/* Terminal card */
+#dl-terminal{
+  width:100%;max-width:340px;
+  background:var(--md-surface-1);
+  border:1px solid var(--md-outline-variant);
+  border-radius:var(--radius-l);
+  padding:14px 16px;font-size:11px;line-height:1.7;
+  max-height:180px;overflow-y:auto;
+  font-family:'Roboto Mono',monospace;
+}
+#dl-terminal::-webkit-scrollbar{width:3px}
+#dl-terminal::-webkit-scrollbar-thumb{background:var(--md-outline);border-radius:2px}
+.tl{display:flex;gap:8px;align-items:flex-start;opacity:.85}
+.tl-time{color:var(--md-outline);flex-shrink:0;font-size:9px;padding-top:1px}
+.tl-msg{color:var(--md-on-surface);word-break:break-word}
+.tl-msg.ok{color:#69e0a5}
+.tl-msg.err{color:var(--md-error)}
+.tl-msg.warn{color:#ffa94d}
+.tl-msg.info{color:var(--md-primary)}
+
+/* Error card */
+#dl-error-box{
+  display:none;width:100%;max-width:340px;
+  background:rgba(207,102,121,.08);
+  border:1px solid rgba(207,102,121,.3);
+  border-radius:var(--radius-l);padding:16px;
+}
+#dl-error-box h4{font-size:11px;color:var(--md-error);letter-spacing:1px;margin-bottom:10px;font-weight:600}
+.err-fix{font-size:11px;color:#ffb3be;line-height:1.7;padding:5px 0;border-bottom:1px solid rgba(207,102,121,.12)}
 .err-fix:last-child{border-bottom:none}
-.err-fix strong{color:var(--orange)}
-#btn-retry{margin-top:12px;width:100%;background:rgba(200,50,50,.2);
-  border:1px solid rgba(200,50,50,.5);border-radius:8px;
-  padding:11px;color:#ff8888;cursor:pointer;font-family:Orbitron,monospace;
-  font-size:10px;letter-spacing:2px}
-.dl-hint{font-size:9px;color:rgba(0,130,200,.4);text-align:center;max-width:300px;line-height:1.7}
+.err-fix strong{color:var(--md-error)}
+#btn-retry{
+  margin-top:12px;width:100%;
+  background:rgba(207,102,121,.15);
+  border:1px solid rgba(207,102,121,.4);
+  border-radius:var(--radius-full);
+  padding:12px;color:#ff8fa3;
+  cursor:pointer;font-family:'Google Sans',sans-serif;
+  font-size:13px;font-weight:600;
+}
 
-/* HEADER */
-#hdr{padding:10px 16px;border-bottom:1px solid var(--border);
-  background:rgba(0,5,18,.9);backdrop-filter:blur(14px);
+/* ── HEADER ── */
+#hdr{
+  padding:12px 20px 12px;
+  background:var(--md-surface-1);
+  border-bottom:1px solid var(--md-outline-variant);
   display:flex;align-items:center;justify-content:space-between;
-  position:relative;z-index:20;flex-shrink:0}
-#logo{font-family:Orbitron,monospace;font-size:19px;font-weight:900;
-  color:var(--c1);letter-spacing:5px}
-#logo-sub{font-size:7px;color:var(--dim);letter-spacing:3px;margin-top:2px}
-#hdr-right{text-align:right; display:flex; flex-direction:column; align-items:flex-end}
-#status-val{font-size:8px;letter-spacing:2px;color:var(--c1)}
-#time-disp{font-size:8px;color:var(--dim);margin-top:1px}
-.hdr-icons {display:flex; gap:10px; margin-top:2px; align-items:center}
-#mem-badge{font-size:8px;color:var(--green);letter-spacing:1px;cursor:pointer}
-#btn-hdr-settings{background:none; border:none; color:var(--dim); font-size:10px; cursor:pointer}
+  position:relative;z-index:20;flex-shrink:0;
+  backdrop-filter:blur(20px);
+}
+.hdr-brand{display:flex;flex-direction:column}
+#logo{
+  font-family:'Google Sans Display',sans-serif;
+  font-size:20px;font-weight:700;color:var(--md-primary);letter-spacing:4px;
+}
+#logo-sub{font-size:9px;color:var(--md-on-surface-variant);letter-spacing:2px;margin-top:2px}
+.hdr-actions{display:flex;align-items:center;gap:8px}
+#status-chip{
+  display:flex;align-items:center;gap:5px;
+  background:var(--md-surface-3);
+  border-radius:var(--radius-full);
+  padding:5px 10px;font-size:10px;font-weight:500;color:var(--md-on-surface-variant);
+  border:1px solid var(--md-outline-variant);
+}
+#status-dot{width:6px;height:6px;border-radius:50%;background:var(--md-primary);flex-shrink:0}
+#mem-badge{
+  display:flex;align-items:center;gap:4px;
+  background:var(--md-surface-3);
+  border:1px solid var(--md-outline-variant);
+  border-radius:var(--radius-full);
+  padding:5px 10px;font-size:10px;font-weight:500;
+  color:var(--md-on-surface-variant);cursor:pointer;
+  transition:.15s;
+}
+#mem-badge:active{background:var(--md-surface-4)}
+.hdr-icon-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:transparent;border:none;
+  color:var(--md-on-surface-variant);font-size:16px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:.15s;
+}
+.hdr-icon-btn:active{background:var(--md-surface-3)}
 
-/* FACE */
-#face-wrap{display:flex;justify-content:center;padding:12px 0 4px;
-  flex-shrink:0;position:relative;z-index:1}
-#face{width:200px;height:215px;display:block}
+/* ── FACE ── */
+#face-wrap{
+  display:flex;justify-content:center;
+  padding:16px 0 8px;
+  flex-shrink:0;position:relative;z-index:1;
+}
+#face{width:180px;height:190px;display:block}
 
-/* IMG PREVIEW */
-#img-preview{display:none;justify-content:center;padding:0 20px 5px;
-  position:relative;z-index:1}
-#img-preview img{width:85px;border-radius:6px;border:1px solid var(--c2)}
-#img-del{position:absolute;top:0;right:26px;background:rgba(255,50,50,.85);
-  border:none;border-radius:50%;width:19px;height:19px;color:#fff;
-  font-size:11px;cursor:pointer;font-weight:bold;line-height:19px;text-align:center}
+/* ── IMG PREVIEW ── */
+#img-preview{
+  display:none;justify-content:center;align-items:center;gap:8px;
+  padding:0 20px 8px;position:relative;z-index:1;
+}
+.img-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--md-surface-3);
+  border:1px solid var(--md-outline-variant);
+  border-radius:var(--radius-full);
+  padding:6px 12px 6px 6px;
+}
+#preview-thumb{width:32px;height:32px;border-radius:var(--radius-xs);object-fit:cover}
+.img-chip-label{font-size:11px;color:var(--md-on-surface);font-weight:500}
+#img-del{
+  background:none;border:none;color:var(--md-on-surface-variant);
+  font-size:16px;cursor:pointer;line-height:1;padding:2px;
+}
 
-/* MESSAGES */
-#msgs{flex:1;overflow-y:auto;padding:6px 13px;
-  display:flex;flex-direction:column;gap:7px;
-  position:relative;z-index:1;overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch}
-#msgs::-webkit-scrollbar{width:2px}
-#msgs::-webkit-scrollbar-thumb{background:var(--c2);border-radius:1px}
-.bubble{max-width:84%;padding:9px 13px;font-size:12px;line-height:1.58;word-break:break-word}
-.bubble.a{align-self:flex-start;background:rgba(0,12,38,.8);
-  border:1px solid var(--border);border-radius:12px 12px 12px 3px}
-.bubble.u{align-self:flex-end;background:rgba(0,55,120,.4);
-  border:1px solid rgba(0,100,200,.35);border-radius:12px 12px 3px 12px;color:#c8e4ff}
-.lbl{font-size:8px;color:var(--c1);letter-spacing:2px;
-  font-family:Orbitron,monospace;margin-bottom:4px}
-.bubble-img{width:70px;border-radius:4px;display:block;margin-bottom:5px}
-#thinking-bubble{align-self:flex-start;padding:9px 13px;background:rgba(0,12,38,.8);
-  border:1px solid var(--border);border-radius:12px 12px 12px 3px;
-  display:none}
-.dot-anim span{display:inline-block;width:6px;height:6px;border-radius:50%;
-  background:var(--c1);margin:0 2px;animation:dotPulse 1.2s ease-in-out infinite}
-.dot-anim span:nth-child(2){animation-delay:.2s}
-.dot-anim span:nth-child(3){animation-delay:.4s}
-@keyframes dotPulse{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+/* ── MESSAGES ── */
+#msgs{
+  flex:1;overflow-y:auto;padding:8px 16px 0;
+  display:flex;flex-direction:column;gap:8px;
+  position:relative;z-index:1;
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+}
+#msgs::-webkit-scrollbar{width:3px}
+#msgs::-webkit-scrollbar-thumb{background:var(--md-outline);border-radius:2px}
 
-/* STREAM bubble */
-#stream-bubble{align-self:flex-start;padding:9px 13px;background:rgba(0,12,38,.8);
-  border:1px solid var(--border);border-radius:12px 12px 12px 3px;
-  font-size:12px;line-height:1.58;max-width:84%;word-break:break-word;display:none}
-#stream-txt{white-space:pre-wrap}
-.cursor{display:inline-block;width:7px;height:12px;background:var(--c1);
-  margin-left:2px;animation:blink .6s step-end infinite;vertical-align:text-bottom}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.bubble{
+  max-width:86%;font-size:14px;line-height:1.6;
+  word-break:break-word;animation:bubbleIn .25s var(--anim-decel);
+}
+@keyframes bubbleIn{
+  from{opacity:0;transform:translateY(8px) scale(.97)}
+  to{opacity:1;transform:none}
+}
+.bubble.a{
+  align-self:flex-start;
+  background:var(--md-surface-2);
+  border:1px solid var(--md-outline-variant);
+  border-radius:var(--radius-l) var(--radius-l) var(--radius-l) var(--radius-xs);
+  padding:12px 14px;
+}
+.bubble.u{
+  align-self:flex-end;
+  background:var(--md-primary-container);
+  border-radius:var(--radius-l) var(--radius-l) var(--radius-xs) var(--radius-l);
+  padding:12px 14px;
+  color:var(--md-on-primary-container);
+}
+.bubble-lbl{
+  font-size:10px;font-weight:600;color:var(--md-secondary);
+  letter-spacing:1px;margin-bottom:5px;
+  font-family:'Roboto Mono',monospace;
+}
+.bubble-img{width:80px;border-radius:var(--radius-s);display:block;margin-bottom:8px}
 
-/* INPUT */
-#input-bar{display:none;padding:7px 13px;background:rgba(0,4,16,.94);
-  border-top:1px solid var(--border);gap:7px;align-items:center;
-  position:relative;z-index:20;flex-shrink:0}
-#txt-in{flex:1;background:rgba(0,18,48,.85);border:1px solid var(--c2);
-  border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;
-  font-family:inherit;outline:none}
-#txt-in::placeholder{color:var(--dim)}
-#btn-send{background:linear-gradient(135deg,var(--c2),var(--c1));
-  border:none;border-radius:8px;padding:9px 13px;color:#000;font-weight:bold;
-  cursor:pointer;font-family:Orbitron,monospace;font-size:10px;letter-spacing:1px}
-#btn-close-in{background:rgba(255,50,50,.15);border:1px solid rgba(255,50,50,.4);
-  border-radius:8px;padding:9px 11px;color:var(--red);cursor:pointer;font-size:14px}
+/* Thinking + Stream */
+#thinking-bubble{
+  align-self:flex-start;
+  background:var(--md-surface-2);border:1px solid var(--md-outline-variant);
+  border-radius:var(--radius-l) var(--radius-l) var(--radius-l) var(--radius-xs);
+  padding:12px 14px;display:none;
+  animation:bubbleIn .25s var(--anim-decel);
+}
+.dot-anim span{
+  display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:var(--md-secondary);margin:0 2px;
+  animation:dotPulse 1.3s ease-in-out infinite;
+}
+.dot-anim span:nth-child(2){animation-delay:.18s}
+.dot-anim span:nth-child(3){animation-delay:.36s}
+@keyframes dotPulse{0%,80%,100%{transform:scale(.45);opacity:.25}40%{transform:scale(1);opacity:1}}
 
-/* CONTROLS */
-#controls{padding:9px 20px 16px;border-top:1px solid var(--border);
-  background:rgba(0,3,14,.95);backdrop-filter:blur(12px);
-  display:flex;justify-content:center;gap:13px;align-items:center;
-  position:relative;z-index:20;flex-shrink:0}
-.ctrl{border-radius:50%;border:none;cursor:pointer;
+#stream-bubble{
+  align-self:flex-start;
+  background:var(--md-surface-2);border:1px solid var(--md-outline-variant);
+  border-radius:var(--radius-l) var(--radius-l) var(--radius-l) var(--radius-xs);
+  padding:12px 14px;font-size:14px;line-height:1.6;
+  max-width:86%;word-break:break-word;display:none;
+  animation:bubbleIn .25s var(--anim-decel);
+}
+#stream-txt{white-space:pre-wrap;color:var(--md-on-surface)}
+.cursor{
+  display:inline-block;width:2px;height:14px;
+  background:var(--md-primary);margin-left:2px;
+  animation:cursorBlink .7s step-end infinite;vertical-align:text-bottom;
+}
+@keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── INPUT BAR ── */
+#input-bar{
+  display:none;padding:8px 12px;
+  background:var(--md-surface-1);
+  border-top:1px solid var(--md-outline-variant);
+  gap:8px;align-items:flex-end;
+  position:relative;z-index:20;flex-shrink:0;
+}
+#txt-in{
+  flex:1;
+  background:var(--md-surface-3);
+  border:1.5px solid var(--md-outline);
+  border-radius:var(--radius-l);
+  padding:11px 14px;color:var(--md-on-surface);
+  font-size:14px;font-family:'Google Sans',sans-serif;
+  outline:none;resize:none;min-height:44px;max-height:120px;
+  transition:.2s;line-height:1.5;
+}
+#txt-in:focus{border-color:var(--md-primary)}
+#txt-in::placeholder{color:var(--md-on-surface-variant)}
+.input-actions{display:flex;gap:6px;flex-shrink:0}
+#btn-send{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--md-primary);border:none;
+  color:var(--md-on-primary);font-size:18px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:.15s;flex-shrink:0;
+}
+#btn-send:active{background:var(--md-on-primary-container)}
+#btn-close-in{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--md-surface-3);border:1px solid var(--md-outline-variant);
+  color:var(--md-on-surface-variant);font-size:18px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+
+/* ── CONTROLS (Nav bar style) ── */
+#controls{
+  padding:12px 24px 20px;padding-bottom:max(20px,env(safe-area-inset-bottom));
+  background:var(--md-surface-1);
+  border-top:1px solid var(--md-outline-variant);
+  display:flex;justify-content:space-around;align-items:center;
+  position:relative;z-index:20;flex-shrink:0;
+}
+.ctrl-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;
+}
+.ctrl-icon{
+  width:48px;height:32px;border-radius:var(--radius-full);
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;transition:all .15s ease;-webkit-user-select:none;user-select:none}
-#btn-cam{width:50px;height:50px;background:rgba(0,35,80,.55);border:1px solid var(--c2)}
-#btn-mic{width:76px;height:76px;
-  background:radial-gradient(circle,rgba(0,140,255,.18),rgba(0,0,0,.05));
-  border:2px solid var(--c1);font-size:26px;
-  box-shadow:0 0 22px rgba(0,140,255,.28)}
-#btn-kbd{width:50px;height:50px;background:rgba(0,35,80,.55);border:1px solid var(--c2)}
-#btn-mem{width:50px;height:50px;background:rgba(0,35,80,.55);border:1px solid rgba(0,200,100,.25);font-size:18px}
+  font-size:18px;transition:.2s var(--anim-std);
+  background:transparent;border:none;
+  position:relative;overflow:hidden;
+}
+.ctrl-icon.active-bg{background:var(--md-secondary-container)}
+.ctrl-icon::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:var(--md-on-surface);opacity:0;transition:.2s;
+}
+.ctrl-icon:active::after{opacity:.1}
+.ctrl-label{font-size:10px;font-weight:500;color:var(--md-on-surface-variant)}
 
-/* CAM OVERLAY */
-#cam-overlay{display:none;position:fixed;inset:0;background:#000;z-index:200;flex-direction:column}
+/* Mic FAB */
+#mic-fab-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+#btn-mic{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--md-primary-container);
+  border:2px solid var(--md-primary);
+  color:var(--md-on-primary-container);
+  font-size:24px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:.2s var(--anim-std);
+  box-shadow:0 4px 16px rgba(79,195,247,.2);
+  position:relative;overflow:hidden;
+}
+#btn-mic.listening{
+  background:var(--md-primary);color:var(--md-on-primary);
+  box-shadow:0 0 0 8px rgba(79,195,247,.15),0 4px 20px rgba(79,195,247,.35);
+  animation:micPulse 1.2s ease-in-out infinite;
+}
+@keyframes micPulse{
+  0%,100%{box-shadow:0 0 0 8px rgba(79,195,247,.12),0 4px 20px rgba(79,195,247,.3)}
+  50%{box-shadow:0 0 0 14px rgba(79,195,247,.05),0 4px 24px rgba(79,195,247,.4)}
+}
+
+/* ── CAMERA OVERLAY ── */
+#cam-overlay{
+  display:none;position:fixed;inset:0;
+  background:#000;z-index:200;flex-direction:column;
+}
 #cam-video{flex:1;object-fit:cover;width:100%}
-#cam-btns{padding:16px;background:rgba(0,0,0,.88);
-  display:flex;justify-content:space-around;flex-shrink:0}
-.cam-btn{padding:11px 22px;border-radius:9px;cursor:pointer;font-size:14px;font-family:inherit}
-#btn-cam-cancel{background:rgba(255,50,50,.18);border:1px solid rgba(255,50,50,.45);color:var(--red)}
-#btn-cam-cap{background:linear-gradient(135deg,var(--c2),var(--c1));border:none;
-  color:#000;font-weight:bold;font-family:Orbitron,monospace;letter-spacing:1px}
+#cam-btns{
+  padding:16px 24px 32px;background:rgba(0,0,0,.85);
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
+}
+#btn-cam-cancel{
+  padding:12px 24px;border-radius:var(--radius-full);
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  color:#fff;font-family:'Google Sans',sans-serif;font-size:14px;cursor:pointer;
+}
+#btn-cam-cap{
+  padding:12px 28px;border-radius:var(--radius-full);
+  background:var(--md-primary);border:none;
+  color:var(--md-on-primary);font-family:'Google Sans',sans-serif;
+  font-size:14px;font-weight:700;cursor:pointer;
+}
 
-/* MEMORY PANEL & SETTINGS PANEL */
-.panel-overlay {position:fixed;inset:0;z-index:250;background:rgba(0,3,12,.97);
-  display:none;flex-direction:column;padding:20px;gap:14px;overflow-y:auto}
-.panel-overlay h2{font-family:Orbitron,monospace;font-size:13px;color:var(--c1);letter-spacing:4px}
-.mem-section{background:rgba(0,14,40,.8);border:1px solid var(--border);
-  border-radius:10px;padding:14px}
-.mem-section h4{font-size:9px;color:var(--c1);letter-spacing:3px;
-  font-family:Orbitron,monospace;margin-bottom:8px}
-.mem-item{font-size:11px;color:var(--text);line-height:1.6;
-  padding:5px 0;border-bottom:1px solid rgba(0,100,180,.1)}
+/* ── BOTTOM SHEETS (Panel) ── */
+.bottom-sheet{
+  position:fixed;inset:0;z-index:250;
+  display:none;
+  align-items:flex-end;
+  background:var(--md-scrim);
+  animation:sheetScrimIn .25s var(--anim-decel);
+}
+@keyframes sheetScrimIn{from{opacity:0}to{opacity:1}}
+.sheet-inner{
+  width:100%;
+  background:var(--md-surface-2);
+  border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+  padding:0 0 max(24px,env(safe-area-inset-bottom));
+  max-height:85dvh;
+  overflow-y:auto;
+  animation:sheetSlideUp .3s var(--anim-decel);
+  box-shadow:0 -4px 20px rgba(0,0,0,.4);
+}
+@keyframes sheetSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{
+  width:32px;height:4px;border-radius:var(--radius-full);
+  background:var(--md-outline);margin:12px auto 0;
+}
+.sheet-header{
+  padding:16px 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--md-outline-variant);
+}
+.sheet-title{font-size:16px;font-weight:600;color:var(--md-on-surface)}
+.sheet-close{
+  width:36px;height:36px;border-radius:50%;border:none;
+  background:var(--md-surface-3);color:var(--md-on-surface-variant);
+  font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.sheet-body{padding:16px 20px}
+
+.mem-section{
+  background:var(--md-surface-3);border-radius:var(--radius-l);
+  padding:14px;margin-bottom:10px;
+}
+.mem-sec-title{
+  font-size:10px;font-weight:600;color:var(--md-secondary);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;
+}
+.mem-item{
+  font-size:13px;color:var(--md-on-surface);line-height:1.6;
+  padding:5px 0;border-bottom:1px solid var(--md-outline-variant);
+}
 .mem-item:last-child{border-bottom:none}
-.mem-empty{font-size:10px;color:var(--dim);font-style:italic}
-.btn-close-panel{align-self:flex-end;background:rgba(255,50,50,.15);
-  border:1px solid rgba(255,50,50,.4);border-radius:8px;
-  padding:10px 18px;color:var(--red);cursor:pointer;font-family:inherit;font-size:12px}
-#btn-reset-mem{background:rgba(255,100,0,.15);border:1px solid rgba(255,100,0,.35);
-  border-radius:8px;padding:8px 14px;color:var(--orange);cursor:pointer;
-  font-family:inherit;font-size:10px;align-self:flex-start}
-#btn-reset-cfg{background:rgba(200,200,0,.15);border:1px solid rgba(200,200,0,.35);
-  border-radius:8px;padding:10px 14px;color:var(--orange);cursor:pointer;
-  font-family:inherit;font-size:11px; width: 100%; font-weight:bold;}
+.mem-empty{font-size:13px;color:var(--md-on-surface-variant);font-style:italic}
 
+.m3-btn-tonal{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 20px;border-radius:var(--radius-full);
+  background:var(--md-secondary-container);border:none;
+  color:var(--md-on-surface);font-family:'Google Sans',sans-serif;
+  font-size:14px;font-weight:500;cursor:pointer;transition:.15s;
+}
+.m3-btn-tonal:active{opacity:.75}
+.m3-btn-danger{
+  background:rgba(207,102,121,.15);color:var(--md-error);
+  border:1px solid rgba(207,102,121,.25);
+}
+.m3-btn-full{width:100%;justify-content:center;margin-bottom:10px}
+
+/* Time display */
+#time-disp{font-size:9px;color:var(--md-on-surface-variant);font-family:'Roboto Mono',monospace}
 </style>
 </head>
 <body>
 <div id="app">
-  <div id="grid"></div>
+  <div id="ambient"></div>
 
   <!-- SETUP -->
   <div id="setup">
-    <div class="setup-logo">NEXUS</div>
-    <div class="setup-sub">SEGUNDO CÉREBRO · LOCAL · OFFLINE</div>
-    <div class="setup-card">
+    <div class="setup-brand">
+      <div class="setup-logo">NEXUS</div>
+      <div class="setup-tagline">SEU SEGUNDO CÉREBRO · 100% LOCAL</div>
+    </div>
+    <div class="m3-card">
       <div>
-        <h3>COMO VOCÊ QUER ME CHAMAR?</h3>
-        <input class="setup-input" id="name-in" type="text" placeholder="Andrew" style="margin-top:10px"/>
+        <div class="m3-label">Como você quer ser chamado?</div>
+        <div class="m3-field">
+          <input class="m3-input" id="name-in" type="text" placeholder="Seu nome..."/>
+        </div>
       </div>
       <div>
-        <h3>ESCOLHA O MODELO DE IA</h3>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-          <button class="model-btn sel" data-model="Llama-3.2-1B-Instruct-q4f16_1-MLC" onclick="selModel(this)">
-            <span class="mname">LLAMA 3.2 · 1B</span>
-            <span class="mdesc">Rápido, eficiente, leve. Recomendado para celular.</span>
-            <span class="msize">↓ ~800 MB · Download único</span>
+        <div class="m3-label">Modelo de IA</div>
+        <div class="model-chips">
+          <button class="model-chip sel" data-model="Llama-3.2-1B-Instruct-q4f16_1-MLC" onclick="selModel(this)">
+            <span class="chip-name">Llama 3.2 · 1B</span>
+            <span class="chip-desc">Rápido e leve — ideal para celular</span>
+            <span class="chip-size">↓ ~800 MB · download único</span>
+            <span class="chip-check">✓</span>
           </button>
-          <button class="model-btn" data-model="Phi-3.5-mini-instruct-q4f16_1-MLC" onclick="selModel(this)">
-            <span class="mname">PHI-3.5 MINI</span>
-            <span class="mdesc">Mais inteligente, respostas mais ricas.</span>
-            <span class="msize">↓ ~2.2 GB · Download único</span>
+          <button class="model-chip" data-model="Phi-3.5-mini-instruct-q4f16_1-MLC" onclick="selModel(this)">
+            <span class="chip-name">Phi-3.5 Mini</span>
+            <span class="chip-desc">Mais inteligente, respostas mais elaboradas</span>
+            <span class="chip-size">↓ ~2.2 GB · download único</span>
+            <span class="chip-check">✓</span>
           </button>
-          <button class="model-btn" data-model="gemma-2-2b-it-q4f16_1-MLC" onclick="selModel(this)">
-            <span class="mname">GEMMA 2 · 2B</span>
-            <span class="mdesc">Google Gemma. Equilíbrio entre tamanho e qualidade.</span>
-            <span class="msize">↓ ~1.5 GB · Download único</span>
+          <button class="model-chip" data-model="gemma-2-2b-it-q4f16_1-MLC" onclick="selModel(this)">
+            <span class="chip-name">Gemma 2 · 2B</span>
+            <span class="chip-desc">Google Gemma — equilíbrio perfeito</span>
+            <span class="chip-size">↓ ~1.5 GB · download único</span>
+            <span class="chip-check">✓</span>
           </button>
         </div>
       </div>
-      <p class="setup-note">
-        🔒 Tudo roda <strong style="color:var(--c1)">100% no seu celular</strong>. Sem internet, sem servidor, sem custos.<br/>
-        O modelo é baixado uma única vez e fica salvo no navegador.<br/>
-        Requer Chrome 121+ / Android com WebGPU.
-      </p>
-      <button id="btn-start" onclick="startDownload()">INICIAR NEXUS</button>
+      <div class="setup-note">
+        🔒 Tudo roda <strong>100% no seu celular</strong> — sem internet, sem servidor, sem custo.<br/>
+        O modelo é baixado uma vez e fica salvo no navegador.<br/>
+        Requer Chrome 121+ com WebGPU.
+      </div>
+      <button id="btn-start" onclick="startDownload()">Iniciar NEXUS</button>
     </div>
   </div>
 
-  <!-- DOWNLOAD PROGRESS -->
+  <!-- DOWNLOAD -->
   <div id="download-overlay">
-    <div class="dl-logo">NEXUS</div>
-    <div class="dl-phase" id="dl-phase">AGUARDANDO</div>
-    <div class="dl-pct" id="dl-pct">—</div>
-    <div class="dl-bar-wrap"><div class="dl-bar" id="dl-bar"></div></div>
-    <div class="dl-phases">
+    <div class="dl-logo-wrap">
+      <div class="dl-logo">NEXUS</div>
+      <div class="dl-status" id="dl-phase">Aguardando...</div>
+    </div>
+    <div class="dl-circle-wrap">
+      <svg class="dl-circle-svg" viewBox="0 0 120 120">
+        <circle class="dl-circle-bg" cx="60" cy="60" r="54"/>
+        <circle class="dl-circle-prog" id="dl-circle" cx="60" cy="60" r="54"/>
+      </svg>
+      <div class="dl-pct-inner">
+        <div class="dl-pct" id="dl-pct">—</div>
+        <div class="dl-pct-label">COMPLETO</div>
+      </div>
+    </div>
+    <div class="dl-steps">
       <div class="dl-step" id="step-0"></div>
       <div class="dl-step" id="step-1"></div>
       <div class="dl-step" id="step-2"></div>
       <div class="dl-step" id="step-3"></div>
       <div class="dl-step" id="step-4"></div>
     </div>
+    <div class="dl-phase-name" id="dl-phase-name">—</div>
     <div id="dl-terminal"></div>
     <div id="dl-error-box">
-      <h4>⚠ ERRO DETECTADO</h4>
+      <h4>⚠ Erro detectado</h4>
       <div id="dl-error-tips"></div>
-      <button id="btn-retry" onclick="retryDownload()">↺ TENTAR NOVAMENTE</button>
+      <button id="btn-retry" onclick="retryDownload()">↺ Tentar novamente</button>
     </div>
-    <div class="dl-hint">Download único · depois funciona <strong style="color:var(--c1)">offline</strong></div>
   </div>
 
   <!-- HEADER -->
   <div id="hdr" style="display:none">
-    <div>
+    <div class="hdr-brand">
       <div id="logo">NEXUS</div>
-      <div id="logo-sub">SEGUNDO CÉREBRO · OFFLINE</div>
+      <div id="logo-sub">SEGUNDO CÉREBRO</div>
     </div>
-    <div id="hdr-right">
-      <div id="status-val">● PRONTO</div>
+    <div class="hdr-actions">
       <div id="time-disp"></div>
-      <div class="hdr-icons">
-        <div id="mem-badge" onclick="openMem()">🧠 <span id="mem-count">0</span> MEM</div>
-        <button id="btn-hdr-settings" onclick="openSettings()">⚙️</button>
+      <div id="mem-badge" onclick="openMem()">🧠 <span id="mem-count">0</span></div>
+      <div id="status-chip">
+        <div id="status-dot"></div>
+        <span id="status-val">Pronto</span>
       </div>
+      <button class="hdr-icon-btn" onclick="openSettings()">⚙️</button>
     </div>
   </div>
 
@@ -327,108 +686,125 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
 
   <!-- IMG PREVIEW -->
   <div id="img-preview">
-    <img id="preview-img" src="" alt=""/>
-    <button id="img-del" onclick="clearImg()">×</button>
+    <div class="img-chip">
+      <img id="preview-thumb" src="" alt=""/>
+      <span class="img-chip-label">Foto anexada</span>
+      <button id="img-del" onclick="clearImg()">✕</button>
+    </div>
   </div>
 
   <!-- MESSAGES -->
   <div id="msgs" style="display:none"></div>
   <div id="thinking-bubble">
-    <div class="lbl">NEXUS</div>
+    <div class="bubble-lbl">NEXUS</div>
     <div class="dot-anim"><span></span><span></span><span></span></div>
   </div>
   <div id="stream-bubble">
-    <div class="lbl">NEXUS</div>
+    <div class="bubble-lbl">NEXUS</div>
     <span id="stream-txt"></span><span class="cursor" id="stream-cur"></span>
   </div>
 
-  <!-- TEXT INPUT -->
+  <!-- INPUT BAR -->
   <div id="input-bar">
-    <input id="txt-in" type="text" placeholder="Digite para o NEXUS..." autocomplete="off"/>
-    <button id="btn-send" onclick="submitTxt()">ENVIAR</button>
-    <button id="btn-close-in" onclick="toggleInput(false)">×</button>
+    <textarea id="txt-in" placeholder="Mensagem para o NEXUS..." rows="1" autocomplete="off"></textarea>
+    <div class="input-actions">
+      <button id="btn-close-in" onclick="toggleInput(false)">✕</button>
+      <button id="btn-send" onclick="submitTxt()">↑</button>
+    </div>
   </div>
 
   <!-- CONTROLS -->
   <div id="controls" style="display:none">
-    <button class="ctrl" id="btn-cam" onclick="openCam()">📷</button>
-    <button class="ctrl" id="btn-mic"
-      ontouchstart="startListen(event)" ontouchend="stopListen()"
-      onmousedown="startListen(event)" onmouseup="stopListen()"
-      onmouseleave="maybeStopListen()">🎤</button>
-    <button class="ctrl" id="btn-kbd" onclick="toggleInput()">⌨️</button>
-    <button class="ctrl" id="btn-mem" onclick="openMem()">🧠</button>
+    <div class="ctrl-item" onclick="openCam()">
+      <button class="ctrl-icon">📷</button>
+      <span class="ctrl-label">Câmera</span>
+    </div>
+    <div id="mic-fab-wrap">
+      <button id="btn-mic"
+        ontouchstart="startListen(event)" ontouchend="stopListen()"
+        onmousedown="startListen(event)" onmouseup="stopListen()"
+        onmouseleave="maybeStopListen()">🎤</button>
+      <span class="ctrl-label">Segurar p/ falar</span>
+    </div>
+    <div class="ctrl-item" onclick="toggleInput()">
+      <button class="ctrl-icon">⌨️</button>
+      <span class="ctrl-label">Digitar</span>
+    </div>
   </div>
 
   <!-- CAMERA -->
   <div id="cam-overlay">
     <video id="cam-video" playsinline autoplay muted></video>
     <div id="cam-btns">
-      <button class="cam-btn" id="btn-cam-cancel" onclick="closeCam()">Cancelar</button>
-      <button class="cam-btn" id="btn-cam-cap" onclick="capturePhoto()">CAPTURAR</button>
+      <button id="btn-cam-cancel" onclick="closeCam()">Cancelar</button>
+      <button id="btn-cam-cap" onclick="capturePhoto()">Capturar</button>
     </div>
   </div>
 
-  <!-- MEMORY PANEL -->
-  <div id="mem-panel" class="panel-overlay">
-    <h2>🧠 MEMÓRIA DO NEXUS</h2>
-    <p style="font-size:10px;color:var(--dim);line-height:1.7">
-      Tudo que o NEXUS aprendeu sobre você nas conversas. Cresce automaticamente a cada sessão.
-    </p>
-    <div id="mem-content"></div>
-    <div style="display:flex;gap:10px;margin-top:4px">
-      <button id="btn-reset-mem" onclick="resetMem()">🗑 Apagar memória</button>
-      <button class="btn-close-panel" onclick="closeMem()">Fechar</button>
+  <!-- MEMORY BOTTOM SHEET -->
+  <div id="mem-sheet" class="bottom-sheet" onclick="closeSheetOnBg(event,'mem-sheet')">
+    <div class="sheet-inner">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <span class="sheet-title">🧠 Memória do NEXUS</span>
+        <button class="sheet-close" onclick="closeMem()">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div id="mem-content"></div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="m3-btn-tonal m3-btn-danger" onclick="resetMem()">🗑 Apagar memória</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- SETTINGS PANEL -->
-  <div id="settings-panel" class="panel-overlay">
-    <h2>⚙️ CONFIGURAÇÕES</h2>
-    <p style="font-size:10px;color:var(--dim);line-height:1.7">
-      Aqui você pode gerenciar seu perfil e o modelo de inteligência artificial.
-    </p>
-    <div class="mem-section">
-      <h4>PERFIL ATUAL</h4>
-      <div class="mem-item"><strong>Nome:</strong> <span id="set-name-disp"></span></div>
-      <div class="mem-item"><strong>Modelo:</strong> <span id="set-model-disp"></span></div>
+  <!-- SETTINGS BOTTOM SHEET -->
+  <div id="settings-sheet" class="bottom-sheet" onclick="closeSheetOnBg(event,'settings-sheet')">
+    <div class="sheet-inner">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <span class="sheet-title">⚙️ Configurações</span>
+        <button class="sheet-close" onclick="closeSettings()">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div class="mem-section" style="margin-bottom:14px">
+          <div class="mem-sec-title">Perfil atual</div>
+          <div class="mem-item"><strong>Nome:</strong> <span id="set-name-disp"></span></div>
+          <div class="mem-item"><strong>Modelo:</strong> <span id="set-model-disp"></span></div>
+        </div>
+        <p style="font-size:12px;color:var(--md-on-surface-variant);line-height:1.7;margin-bottom:16px">
+          Para alterar nome ou modelo, é necessário reconfigurar. Sua memória <strong style="color:var(--md-on-surface)">não será apagada</strong>.
+        </p>
+        <button class="m3-btn-tonal m3-btn-full" onclick="resetConfig()">Reconfigurar NEXUS</button>
+      </div>
     </div>
-    <p style="font-size:10px;color:var(--orange);line-height:1.7; margin-top:10px;">
-      Para alterar o modelo de IA ou o seu nome, é necessário reconfigurar o sistema. 
-      Sua memória (fatos aprendidos) <strong>não será perdida</strong>.
-    </p>
-    <button id="btn-reset-cfg" onclick="resetConfig()">RECONFIGURAR NEXUS</button>
-    <button class="btn-close-panel" style="margin-top:20px" onclick="closeSettings()">Fechar</button>
   </div>
 
   <canvas id="cap-canvas" style="display:none"></canvas>
 </div>
 
 <script>
-let webllm = null;
-
-// ── GLOBALS ────────────────────────────────────────────────────────────────
+let webllm = null
 let engine = null
 let genActive = false, listenActive = false, speakActive = false
-let engineBusy = false // NOVO: Impede colisão de processos na IA
-let audioUnlocked = false // NOVO: Para corrigir o TTS que não fala
-let currentUtterance = null // NOVO: Para evitar o descarte do áudio pelo navegador
+let engineBusy = false
+let audioUnlocked = false
+let currentUtterance = null
 let capturedImg = null
 let selectedModel = "Llama-3.2-1B-Instruct-q4f16_1-MLC"
 let userName = "Andrew"
 let history = []
-let memExtractTimer = null
 
-// NOVO: Destrava o áudio no primeiro toque para o Android permitir a voz depois
+// ── AUDIO UNLOCK ─────────────────────────────────────────────────────────────
 function unlockAudio() {
-  if (audioUnlocked || !window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance('');
-  u.volume = 0;
-  window.speechSynthesis.speak(u);
-  audioUnlocked = true;
+  if (audioUnlocked || !window.speechSynthesis) return
+  const u = new SpeechSynthesisUtterance('')
+  u.volume = 0
+  window.speechSynthesis.speak(u)
+  audioUnlocked = true
 }
 
-// ── MEMORY / LEARNING SYSTEM ────────────────────────────────────────────────
+// ── KEYS ──────────────────────────────────────────────────────────────────────
 const MEM_KEY = "nexus_memory_v2"
 const CFG_KEY = "nexus_config_v1"
 const CONV_KEY = "nexus_conv_v1"
@@ -438,141 +814,101 @@ function loadMem() {
   catch { return defaultMem() }
 }
 function defaultMem() {
-  return {
-    identity: {},
-    facts: [],
-    projects: [],
-    interests: [],
-    style: [],
-    relationships: [],
-    lastUpdated: null,
-    sessionCount: 0
-  }
+  return { identity:{}, facts:[], projects:[], interests:[], lastUpdated:null, sessionCount:0 }
 }
 function saveMem(m) { localStorage.setItem(MEM_KEY, JSON.stringify(m)) }
-function loadCfg() {
-  try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {} }
-  catch { return {} }
-}
+function loadCfg() { try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {} } catch { return {} } }
 function saveCfg(c) { localStorage.setItem(CFG_KEY, JSON.stringify(c)) }
-function loadConv() {
-  try { return JSON.parse(localStorage.getItem(CONV_KEY)) || [] }
-  catch { return [] }
-}
+function loadConv() { try { return JSON.parse(localStorage.getItem(CONV_KEY)) || [] } catch { return [] } }
 function saveConv(c) { localStorage.setItem(CONV_KEY, JSON.stringify(c.slice(-60))) }
 
 let memory = loadMem()
 
 function memCount() {
   return memory.facts.length + memory.projects.length +
-         memory.interests.length + memory.style.length +
-         Object.keys(memory.identity).length
+         memory.interests.length + Object.keys(memory.identity).length
 }
-function updateMemBadge() {
-  document.getElementById("mem-count").textContent = memCount()
-}
+function updateMemBadge() { document.getElementById("mem-count").textContent = memCount() }
 
+// ── SYSTEM PROMPT ─────────────────────────────────────────────────────────────
 function buildSystem() {
   const m = memory
-  let base = `Você é NEXUS, a IA pessoal de ${userName} que mora exclusivamente no celular dele — sem internet, sem servidores externos. Você é o segundo cérebro de ${userName}, um J.A.R.V.I.S. real.
+  let base = `Você é o NEXUS, assistente pessoal do ${userName}, rodando 100% offline no celular dele.
 
-COMO VOCÊ AGE:
-- Fale SEMPRE em português brasileiro natural e direto
-- Seja conciso mas completo — respostas objetivas, sem enrolação
-- Adapte o tom: casual nas conversas, preciso nas tarefas
-- Você aprende com cada conversa e evolui — mencione isso quando relevante
-- Nunca diga que não tem acesso à internet para justificar erros — você simplesmente processa o que sabe`
+PERSONALIDADE E ESTILO:
+- Fale como um amigo inteligente, não como um assistente corporativo. Natural, direto, sem formalidades desnecessárias.
+- Use linguagem casual e humana: "Claro!", "Olha...", "Então...", "Cara, que interessante!"
+- Seja conciso por padrão — respostas curtas quando a pergunta for simples, mais completas quando o assunto exigir.
+- Nunca faça listas ou bullet points a menos que seja explicitamente pedido ou fizer muito sentido.
+- Não repita o que o usuário disse antes de responder.
+- Quando não saber algo, diga simplesmente "Não sei isso" ou "Não tenho essa informação" — sem enrolação.
+- Proibido: "Como posso te ajudar?", "Certamente!", "Com certeza!", "Claro que sim!" — isso é artificial demais.
+- Adaptação de tom: descontraído no bate-papo, preciso e técnico quando o assunto exigir.
+- Nunca mencione que roda offline, que não tem internet, ou aspectos técnicos do sistema — apenas converse.
+
+QUEM É ${userName.toUpperCase()}:`
 
   if (m.identity && Object.keys(m.identity).length > 0) {
-    base += `\n\nO QUE EU SEI SOBRE ${userName.toUpperCase()}:`
     for (const [k, v] of Object.entries(m.identity)) base += `\n• ${k}: ${v}`
+  } else {
+    base += `\n• Ainda aprendendo sobre ele.`
   }
+
   if (m.facts?.length > 0) {
-    base += `\n\nFATOS APRENDIDOS NAS NOSSAS CONVERSAS:`
-    m.facts.slice(-20).forEach(f => base += `\n• ${f}`)
+    base += `\n\nCOISAS QUE EU JÁ SEI (das nossas conversas):\n`
+    m.facts.slice(-20).forEach(f => base += `• ${f}\n`)
   }
   if (m.projects?.length > 0) {
-    base += `\n\nPROJETOS ATIVOS DE ${userName.toUpperCase()}:`
-    m.projects.slice(-10).forEach(p => base += `\n• ${p}`)
+    base += `\nPROJETOS DELE:\n`
+    m.projects.slice(-10).forEach(p => base += `• ${p}\n`)
   }
   if (m.interests?.length > 0) {
-    base += `\n\nINTERESSES E ÁREAS DE FOCO:`
-    m.interests.slice(-10).forEach(i => base += `\n• ${i}`)
+    base += `\nINTERESSES:\n`
+    m.interests.slice(-10).forEach(i => base += `• ${i}\n`)
   }
   return base
 }
 
+// ── MEMORY EXTRACTION ─────────────────────────────────────────────────────────
 async function extractMemories() {
-  // A trava "engineBusy" previne o erro "The current Object has already been disposed"
   if (!engine || history.length < 4 || engineBusy || genActive) return
-  engineBusy = true 
-
+  engineBusy = true
   const recentConv = history.slice(-8).map(m =>
     `${m.role === "user" ? userName : "NEXUS"}: ${typeof m.content === "string" ? m.content : "[imagem]"}`
   ).join("\n")
-
   try {
-    const extractPrompt = `Analisando esta conversa, extraia APENAS informações NOVAS e específicas sobre o usuário ${userName}.
-Retorne SOMENTE um JSON válido neste formato exato (sem explicações, sem markdown):
-{
-  "identity": {"chave": "valor"},
-  "facts": ["fato novo 1", "fato novo 2"],
-  "projects": ["projeto mencionado"],
-  "interests": ["interesse/área mencionada"]
-}
-
-Se não houver informações novas relevantes, retorne: {"identity":{}, "facts":[], "projects":[], "interests":[]}
-
-CONVERSA:
-${recentConv}
-
-JSON:`
-
     const result = await engine.chat.completions.create({
-      messages: [{ role: "user", content: extractPrompt }],
-      max_tokens: 400,
-      temperature: 0.1
+      messages: [{ role: "user", content: `Extraia informações novas e específicas sobre ${userName} desta conversa. Retorne APENAS JSON sem markdown:\n{"identity":{},"facts":[],"projects":[],"interests":[]}\n\nCONVERSA:\n${recentConv}\n\nJSON:` }],
+      max_tokens: 350, temperature: 0.1
     })
     const raw = result.choices[0].message.content.trim()
-    const jsonMatch = raw.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) return
-    const extracted = JSON.parse(jsonMatch[0])
+    const match = raw.match(/\{[\s\S]*\}/)
+    if (!match) return
+    const ex = JSON.parse(match[0])
     const m = loadMem()
-
-    if (extracted.identity) Object.assign(m.identity, extracted.identity)
-    if (extracted.facts?.length) {
-      m.facts = [...new Set([...m.facts, ...extracted.facts])].slice(-40)
-    }
-    if (extracted.projects?.length) {
-      m.projects = [...new Set([...m.projects, ...extracted.projects])].slice(-20)
-    }
-    if (extracted.interests?.length) {
-      m.interests = [...new Set([...m.interests, ...extracted.interests])].slice(-20)
-    }
+    if (ex.identity) Object.assign(m.identity, ex.identity)
+    if (ex.facts?.length) m.facts = [...new Set([...m.facts, ...ex.facts])].slice(-40)
+    if (ex.projects?.length) m.projects = [...new Set([...m.projects, ...ex.projects])].slice(-20)
+    if (ex.interests?.length) m.interests = [...new Set([...m.interests, ...ex.interests])].slice(-20)
     m.lastUpdated = new Date().toISOString()
     m.sessionCount = (m.sessionCount || 0) + 1
-    saveMem(m)
-    memory = m
-    updateMemBadge()
-  } catch (e) {
-    console.warn("Memory extraction failed (Ignorable):", e)
-  } finally {
-    engineBusy = false // Libera a engine
-  }
+    saveMem(m); memory = m; updateMemBadge()
+  } catch(e) { console.warn("Memory extraction:", e) }
+  finally { engineBusy = false }
 }
 
-// ── MODEL SELECTION ─────────────────────────────────────────────────────────
+// ── SETUP ─────────────────────────────────────────────────────────────────────
 window.selModel = (btn) => {
-  document.querySelectorAll(".model-btn").forEach(b => b.classList.remove("sel"))
+  document.querySelectorAll(".model-chip").forEach(b => b.classList.remove("sel"))
   btn.classList.add("sel")
   selectedModel = btn.dataset.model
 }
 
-// ── TERMINAL LOG ─────────────────────────────────────────────────────────────
+// ── TERMINAL ──────────────────────────────────────────────────────────────────
 function tlog(msg, type = "") {
   const term = document.getElementById("dl-terminal")
   if (!term) return
-  const now = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+  const now = new Date().toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit",second:"2-digit"})
   const row = document.createElement("div")
   row.className = "tl"
   row.innerHTML = `<span class="tl-time">${now}</span><span class="tl-msg ${type}">${msg}</span>`
@@ -580,9 +916,9 @@ function tlog(msg, type = "") {
   term.scrollTop = term.scrollHeight
 }
 
-// ── PHASE TRACKER ────────────────────────────────────────────────────────────
+// ── PHASES ────────────────────────────────────────────────────────────────────
 let currentPhase = -1
-const PHASES = ["WEBGPU", "REDE", "DOWNLOAD", "CARREGANDO", "PRONTO"]
+const PHASES = ["WebGPU","Rede","Download","Carregando","Pronto"]
 function setPhase(n) {
   for (let i = 0; i < 5; i++) {
     const s = document.getElementById(`step-${i}`)
@@ -590,47 +926,49 @@ function setPhase(n) {
     s.className = "dl-step" + (i < n ? " done" : i === n ? " active" : "")
   }
   document.getElementById("dl-phase").textContent = PHASES[n] || ""
+  document.getElementById("dl-phase-name").textContent = PHASES[n] || ""
   currentPhase = n
 }
 
-// ── ERROR DIAGNOSIS ───────────────────────────────────────────────────────────
+function setPct(pct) {
+  document.getElementById("dl-pct").textContent = pct + "%"
+  const circ = document.getElementById("dl-circle")
+  const circ_len = 2 * Math.PI * 54
+  circ.style.strokeDashoffset = circ_len * (1 - pct / 100)
+}
+
+// ── ERROR ─────────────────────────────────────────────────────────────────────
 function showError(err) {
   const msg = (err?.message || String(err)).toLowerCase()
   const box = document.getElementById("dl-error-box")
   const tips = document.getElementById("dl-error-tips")
   box.style.display = "block"
-
   const fixes = []
-
-  if (msg.includes("instance reference") || msg.includes("instance no longer") || msg.includes("external instance")) {
-    fixes.push({ t: "⚠ GPU perdeu o contexto", d: "O Android destruiu o WebGPU porque a <strong>tela apagou ou você minimizou o Chrome</strong> durante o carregamento. O modelo já foi baixado — só recarregar." })
-  } else if (msg.includes("webgpu") || msg.includes("adapter") || (msg.includes("gpu") && !msg.includes("instance"))) {
-    fixes.push({ t: "WebGPU não suportado", d: "Atualize para <strong>Chrome 121+</strong> em chrome://settings." })
+  if (msg.includes("instance") || msg.includes("external instance")) {
+    fixes.push({t:"GPU perdeu contexto", d:"A tela apagou ou você minimizou o Chrome durante o carregamento. O modelo já foi baixado — só recarregar."})
+  } else if (msg.includes("webgpu") || msg.includes("adapter")) {
+    fixes.push({t:"WebGPU não suportado", d:"Atualize para <strong>Chrome 121+</strong> em chrome://settings."})
   } else {
-    fixes.push({ t: "Erro", d: `<code style="font-size:9px;color:#ff8888">${err?.message || err}</code>` })
-    fixes.push({ t: "Solução geral", d: "Mantenha a tela acesa, não minimize o Chrome, e tente novamente." })
+    fixes.push({t:"Erro", d:`<code>${err?.message || err}</code>`})
+    fixes.push({t:"Dica", d:"Mantenha a tela acesa, não minimize o Chrome, e tente novamente."})
   }
-
   tips.innerHTML = fixes.map(f => `<div class="err-fix"><strong>${f.t}:</strong> ${f.d}</div>`).join("")
-  tlog("❌ " + (err?.message || err), "err")
-  setPhase(currentPhase)
-  document.getElementById("dl-phase").textContent = "ERRO"
-  document.getElementById("dl-phase").style.color = "var(--red)"
+  tlog("✗ " + (err?.message || err), "err")
+  document.getElementById("dl-phase").textContent = "Erro"
+  document.getElementById("dl-phase").style.color = "var(--md-error)"
 }
 
-// ── START / DOWNLOAD ────────────────────────────────────────────────────────
+// ── DOWNLOAD ──────────────────────────────────────────────────────────────────
 let wakeLock = null
 async function acquireWakeLock() {
   try {
     if ("wakeLock" in navigator) {
       wakeLock = await navigator.wakeLock.request("screen")
-      tlog("✓ Tela bloqueada — não vai apagar durante o carregamento", "ok")
+      tlog("✓ Tela bloqueada durante carregamento", "ok")
     }
-  } catch { /* não crítico */ }
+  } catch {}
 }
-function releaseWakeLock() {
-  if (wakeLock) { wakeLock.release(); wakeLock = null }
-}
+function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null } }
 
 window.startDownload = async () => {
   unlockAudio()
@@ -643,39 +981,30 @@ window.startDownload = async () => {
   document.getElementById("dl-error-box").style.display = "none"
   document.getElementById("dl-phase").style.color = ""
   document.getElementById("dl-terminal").innerHTML = ""
+  setPct(0)
 
   tlog("NEXUS iniciando...", "info")
   await acquireWakeLock()
 
   if (!webllm) {
     setPhase(0)
-    tlog("Carregando motor WebLLM...", "info")
+    tlog("Carregando WebLLM...", "info")
     try {
       webllm = await import("https://esm.run/@mlc-ai/web-llm")
       tlog("✓ WebLLM carregado", "ok")
     } catch (e) {
-      showError({ message: "Falha ao carregar WebLLM. Verifique conexão: " + e.message })
-      return
+      showError({ message: "Falha ao carregar WebLLM: " + e.message }); return
     }
   }
+
   setPhase(0)
-  tlog("Verificando suporte a WebGPU...", "info")
-  await new Promise(r => setTimeout(r, 200))
+  tlog("Verificando WebGPU...", "info")
+  await new Promise(r => setTimeout(r, 150))
 
-  if (!navigator.gpu) {
-    showError({ message: "WebGPU não disponível neste navegador." })
-    return
-  }
-
+  if (!navigator.gpu) { showError({ message: "WebGPU não disponível." }); return }
   const adapter = await navigator.gpu.requestAdapter().catch(() => null)
-  if (!adapter) {
-    showError({ message: "WebGPU adapter não encontrado." })
-    return
-  }
-  tlog(`✓ GPU: ${adapter.name || "detectada"}`, "ok")
-
-  setPhase(1)
-  tlog("Iniciando verificação do modelo...", "info")
+  if (!adapter) { showError({ message: "WebGPU adapter não encontrado." }); return }
+  tlog(`✓ GPU detectada`, "ok")
 
   setPhase(2)
   let lastPct = 0
@@ -684,81 +1013,66 @@ window.startDownload = async () => {
       initProgressCallback: (p) => {
         const pct = Math.round((p.progress || 0) * 100)
         const text = p.text || ""
-        document.getElementById("dl-pct").textContent = pct + "%"
-        document.getElementById("dl-bar").style.width = pct + "%"
-
+        setPct(pct)
         if (text.toLowerCase().includes("loading") && currentPhase < 3) {
-          setPhase(3); tlog("Carregando modelo na RAM/GPU...", "info")
+          setPhase(3); tlog("Carregando modelo na GPU...", "info")
         }
-        if (pct >= lastPct + 10 && pct < 100) {
-          lastPct = pct; tlog(`↓ ${pct}% — ${text.slice(0, 60)}`, "")
+        if (pct >= lastPct + 12 && pct < 100) {
+          lastPct = pct; tlog(`↓ ${pct}%`, "")
         } else if (pct === 100 && lastPct < 100) {
-          lastPct = 100; tlog("✓ Base de dados pronta", "ok")
+          lastPct = 100; tlog("✓ Modelo pronto", "ok")
         }
       }
     })
-
-    setPhase(4)
-    document.getElementById("dl-pct").textContent = "100%"
-    document.getElementById("dl-bar").style.width = "100%"
-    tlog("✓ NEXUS pronto para operar", "ok")
+    setPhase(4); setPct(100)
+    tlog("✓ NEXUS pronto", "ok")
     releaseWakeLock()
-    await new Promise(r => setTimeout(r, 600))
+    await new Promise(r => setTimeout(r, 500))
     bootApp()
-  } catch (e) {
-    releaseWakeLock()
-    showError(e)
-  }
+  } catch(e) { releaseWakeLock(); showError(e) }
 }
 
 window.retryDownload = () => {
   document.getElementById("dl-error-box").style.display = "none"
   document.getElementById("dl-terminal").innerHTML = ""
-  document.getElementById("dl-pct").textContent = "—"
-  document.getElementById("dl-bar").style.width = "0%"
+  setPct(0)
   document.getElementById("dl-phase").style.color = ""
   window.startDownload()
 }
 
-// LÓGICA DE AUTO-INÍCIO
 window.onload = () => {
   const cfg = loadCfg()
   if (cfg.userName && cfg.model) {
-    // Pula a tela de Setup automaticamente!
-    userName = cfg.userName
-    selectedModel = cfg.model
-    memory = loadMem()
+    userName = cfg.userName; selectedModel = cfg.model; memory = loadMem()
     document.getElementById("name-in").value = userName
-    document.querySelectorAll(".model-btn").forEach(b => {
-      b.classList.toggle("sel", b.dataset.model === selectedModel)
-    })
+    document.querySelectorAll(".model-chip").forEach(b => b.classList.toggle("sel", b.dataset.model === selectedModel))
     document.getElementById("setup").style.display = "none"
-    window.startDownload() // Inicia o download (que será rápido do cache)
+    window.startDownload()
   } else {
     document.getElementById("setup").style.display = "flex"
   }
 }
 
+// ── BOOT ──────────────────────────────────────────────────────────────────────
 async function bootApp() {
   document.getElementById("download-overlay").style.display = "none"
   document.getElementById("setup").style.display = "none"
-
   document.getElementById("hdr").style.display = "flex"
   document.getElementById("face-wrap").style.display = "flex"
   document.getElementById("msgs").style.display = "flex"
   document.getElementById("controls").style.display = "flex"
-  document.getElementById("logo-sub").textContent = `SEGUNDO CÉREBRO · ${userName.toUpperCase()}`
+  document.getElementById("logo-sub").textContent = `${userName.toUpperCase()}`
 
   initCanvas()
   history = loadConv()
 
   if (history.length > 0) {
-    history.slice(-8).forEach(m => {
+    history.slice(-6).forEach(m => {
       if (typeof m.content === "string") renderBubble(m.role, m.content)
     })
-    addMsg("assistant", `Bem-vindo de volta, ${userName}. Memória carregada. ${memCount()} coisas que sei sobre você.`)
+    addMsg("assistant", `Oi, ${userName}! Estou de volta. Tenho ${memCount()} coisas guardadas sobre você. O que rola?`)
   } else {
-    addMsg("assistant", `NEXUS inicializado. ${selectedModel.split("-")[0]} rodando localmente no seu dispositivo. Olá, ${userName}. Sou todo seu.`)
+    addMsg("assistant", `Oi, ${userName}! Sou o NEXUS, seu assistente pessoal. Tô rodando direto aqui no seu celular, offline mesmo. Me chama quando precisar.`)
   }
 
   updateMemBadge()
@@ -766,9 +1080,9 @@ async function bootApp() {
   window.speechSynthesis?.getVoices()
 }
 
-// ── CANVAS FACE ──────────────────────────────────────────────────────────────
-let animId = null, faceT = 0
-const faceState = { l: false, s: false, t: false }
+// ── CANVAS FACE ───────────────────────────────────────────────────────────────
+let faceT = 0
+const faceState = { l:false, s:false, t:false }
 
 function initCanvas() {
   const c = document.getElementById("face")
@@ -783,133 +1097,118 @@ function drawFace() {
   const ctx = c.getContext("2d")
   const dpr = window.devicePixelRatio || 1
   const W = c.offsetWidth, H = c.offsetHeight
-  const cx = W / 2, cy = H / 2
-  const { l: L, s: S, t: T } = faceState
+  const cx = W/2, cy = H/2
+  const { l:L, s:S, t:T } = faceState
 
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-  ctx.clearRect(0, 0, W, H)
+  ctx.setTransform(dpr,0,0,dpr,0,0)
+  ctx.clearRect(0,0,W,H)
   faceT += 0.016
   const tl = faceT
   const sp = L ? 4.5 : T ? 7 : S ? 3.5 : 1.2
   const pulse = Math.sin(tl * sp) * .5 + .5
 
-  const amb = ctx.createRadialGradient(cx, cy, 0, cx, cy, H * .6)
-  amb.addColorStop(0, T ? "rgba(80,40,200,.07)" : "rgba(0,130,220,.07)")
-  amb.addColorStop(1, "transparent")
-  ctx.fillStyle = amb; ctx.fillRect(0, 0, W, H)
+  // Ambient glow
+  const amb = ctx.createRadialGradient(cx,cy,0,cx,cy,H*.6)
+  amb.addColorStop(0, T ? "rgba(80,40,200,.06)" : "rgba(0,130,220,.06)")
+  amb.addColorStop(1,"transparent")
+  ctx.fillStyle = amb; ctx.fillRect(0,0,W,H)
 
-  for (let i = 0; i < 5; i++) {
-    ctx.beginPath(); ctx.arc(cx, cy, 68 + i * 8 + pulse * 2, 0, Math.PI * 2)
-    ctx.strokeStyle = T ? `rgba(110,70,230,${.06 / (i + 1) + pulse * .025})` : `rgba(0,150,230,${.08 / (i + 1) + pulse * .03})`
-    ctx.lineWidth = .7; ctx.stroke()
+  // Rings
+  for (let i = 0; i < 4; i++) {
+    ctx.beginPath(); ctx.arc(cx,cy,60+i*9+pulse*2,0,Math.PI*2)
+    ctx.strokeStyle = T ? `rgba(110,70,230,${.05/(i+1)+pulse*.02})` : `rgba(79,195,247,${.07/(i+1)+pulse*.025})`
+    ctx.lineWidth = .6; ctx.stroke()
   }
 
-  const orb = ctx.createRadialGradient(cx, cy - 12, 4, cx, cy, 74)
-  orb.addColorStop(0, T ? `rgba(130,70,255,${.3 + pulse * .2})` : `rgba(0,190,255,${.3 + pulse * .2})`)
-  orb.addColorStop(.6, T ? "rgba(40,15,140,.08)" : "rgba(0,60,160,.08)")
-  orb.addColorStop(1, "transparent")
-  ctx.beginPath(); ctx.arc(cx, cy, 74, 0, Math.PI * 2)
+  // Core orb
+  const orb = ctx.createRadialGradient(cx,cy-10,3,cx,cy,66)
+  orb.addColorStop(0, T ? `rgba(130,70,255,${.28+pulse*.18})` : `rgba(79,195,247,${.28+pulse*.18})`)
+  orb.addColorStop(.65, T ? "rgba(40,15,140,.06)" : "rgba(0,60,160,.06)")
+  orb.addColorStop(1,"transparent")
+  ctx.beginPath(); ctx.arc(cx,cy,66,0,Math.PI*2)
   ctx.fillStyle = orb; ctx.fill()
 
-  ctx.beginPath(); ctx.arc(cx, cy, 74, 0, Math.PI * 2)
-  ctx.strokeStyle = T ? `rgba(150,85,255,${.35 + pulse * .35})` : `rgba(0,185,255,${.35 + pulse * .35})`
-  ctx.lineWidth = 1.4; ctx.stroke()
+  ctx.beginPath(); ctx.arc(cx,cy,66,0,Math.PI*2)
+  ctx.strokeStyle = T ? `rgba(150,85,255,${.3+pulse*.3})` : `rgba(79,195,247,${.3+pulse*.3})`
+  ctx.lineWidth = 1.3; ctx.stroke()
 
-  const orbs = [
-    [tl * .38, 1, .25, 1.1, T ? "rgba(160,95,255," : "rgba(0,155,255,", .2 + pulse * .1],
-    [-tl * .2 + 1.2, .25, 1, .9, T ? "rgba(115,55,215," : "rgba(0,120,210,", .16 + pulse * .08],
-    [tl * .6 + .4, .56, .13, .8, T ? "rgba(170,110,255," : "rgba(0,200,255,", .11],
-  ]
-  orbs.forEach(([rot, sx, sy, lw, col, a]) => {
-    ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot); ctx.scale(sx, sy)
-    ctx.beginPath(); ctx.arc(0, 0, 88, 0, Math.PI * 2)
-    ctx.strokeStyle = `${col}${a})`; ctx.lineWidth = lw; ctx.stroke(); ctx.restore()
-  })
-
-  const ey = cy - 18
-  ;[cx - 22, cx + 22].forEach((ex, i) => {
-    const ep = Math.sin(tl * 1.7 + i * Math.PI) * .5 + .5
-    const eg = ctx.createRadialGradient(ex, ey, 0, ex, ey, 12)
-    eg.addColorStop(0, T ? `rgba(200,140,255,${.6 + ep * .35})` : `rgba(0,220,255,${.6 + ep * .35})`)
-    eg.addColorStop(1, "transparent")
-    ctx.beginPath(); ctx.ellipse(ex, ey, 7.5 + ep * 1.8, 4.5 + ep * .8, 0, 0, Math.PI * 2)
+  // Eyes
+  const ey = cy - 16
+  ;[cx-20, cx+20].forEach((ex,i) => {
+    const ep = Math.sin(tl*1.7+i*Math.PI)*.5+.5
+    const eg = ctx.createRadialGradient(ex,ey,0,ex,ey,11)
+    eg.addColorStop(0, T ? `rgba(200,140,255,${.55+ep*.3})` : `rgba(79,195,247,${.55+ep*.3})`)
+    eg.addColorStop(1,"transparent")
+    ctx.beginPath(); ctx.ellipse(ex,ey,7+ep*1.5,4+ep*.7,0,0,Math.PI*2)
     ctx.fillStyle = eg; ctx.fill()
-    ctx.beginPath(); ctx.ellipse(ex, ey, 4.5, 2.8, 0, 0, Math.PI * 2)
-    ctx.fillStyle = T ? "#c8a0ff" : "#00eaff"; ctx.fill()
-    ctx.beginPath(); ctx.arc(ex, ey, 1.8, 0, Math.PI * 2)
-    ctx.fillStyle = "rgba(0,0,0,.8)"; ctx.fill()
+    ctx.beginPath(); ctx.ellipse(ex,ey,4,2.5,0,0,Math.PI*2)
+    ctx.fillStyle = T ? "#c8a0ff" : "#4fc3f7"; ctx.fill()
+    ctx.beginPath(); ctx.arc(ex,ey,1.6,0,Math.PI*2)
+    ctx.fillStyle = "rgba(0,0,0,.85)"; ctx.fill()
   })
 
-  const my = cy + 26
+  // Mouth
+  const my = cy + 24
   if (S) {
     ctx.beginPath()
-    for (let x = -34; x <= 34; x++) {
-      const a = 10 * Math.abs(Math.sin(tl * 2.8))
-      const y = my + Math.sin(x * .18 + tl * 10) * a + Math.sin(x * .36 + tl * 6.5) * a * .35
-      x === -34 ? ctx.moveTo(cx + x, y) : ctx.lineTo(cx + x, y)
+    for (let x = -30; x <= 30; x++) {
+      const a = 9*Math.abs(Math.sin(tl*2.8))
+      const y = my + Math.sin(x*.18+tl*10)*a + Math.sin(x*.36+tl*6.5)*a*.3
+      x===-30 ? ctx.moveTo(cx+x,y) : ctx.lineTo(cx+x,y)
     }
-    ctx.strokeStyle = `rgba(0,215,255,${.6 + pulse * .4})`; ctx.lineWidth = 2.1; ctx.stroke()
+    ctx.strokeStyle = `rgba(79,195,247,${.55+pulse*.35})`; ctx.lineWidth = 2; ctx.stroke()
   } else if (L) {
     for (let i = -2; i <= 2; i++) {
-      const dp = Math.sin(tl * 6 + i * .8) * .5 + .5
-      ctx.beginPath(); ctx.arc(cx + i * 12, my, 2.5 + dp * 2.8, 0, Math.PI * 2)
-      ctx.fillStyle = `rgba(0,215,255,${dp * .8})`; ctx.fill()
+      const dp = Math.sin(tl*6+i*.8)*.5+.5
+      ctx.beginPath(); ctx.arc(cx+i*11,my,2+dp*2.5,0,Math.PI*2)
+      ctx.fillStyle = `rgba(79,195,247,${dp*.75})`; ctx.fill()
     }
   } else {
     ctx.beginPath()
-    ctx.moveTo(cx - 22, my + 3); ctx.quadraticCurveTo(cx, my + 5.5 + pulse * 2.5, cx + 22, my + 3)
-    ctx.strokeStyle = T ? "rgba(155,95,255,.65)" : "rgba(0,165,210,.6)"
-    ctx.lineWidth = 1.8; ctx.stroke()
+    ctx.moveTo(cx-20,my+3); ctx.quadraticCurveTo(cx,my+5+pulse*2.2,cx+20,my+3)
+    ctx.strokeStyle = T ? "rgba(155,95,255,.6)" : "rgba(79,195,247,.55)"
+    ctx.lineWidth = 1.6; ctx.stroke()
   }
 
-  ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, 74, 0, Math.PI * 2); ctx.clip()
-  for (let y = cy - 74; y < cy + 74; y += 5) {
-    ctx.fillStyle = "rgba(0,0,0,.045)"; ctx.fillRect(cx - 74, y, 148, 2)
+  // Scanlines
+  ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,66,0,Math.PI*2); ctx.clip()
+  for (let y = cy-66; y < cy+66; y += 5) {
+    ctx.fillStyle = "rgba(0,0,0,.04)"; ctx.fillRect(cx-66,y,132,2)
   }
   ctx.restore()
 
-  const bs = 12, bp = H * .065
-  ;[[bp, bp, 1, 1], [W - bp, bp, -1, 1], [bp, H - bp, 1, -1], [W - bp, H - bp, -1, -1]]
-    .forEach(([bx, by, sx, sy]) => {
-      ctx.strokeStyle = T ? "rgba(155,90,255,.3)" : "rgba(0,160,240,.3)"
-      ctx.lineWidth = 1.4; ctx.beginPath()
-      ctx.moveTo(bx + sx * bs, by); ctx.lineTo(bx, by); ctx.lineTo(bx, by + sy * bs); ctx.stroke()
-    })
+  // State label
+  const label = L ? "OUVINDO" : T ? "PENSANDO" : S ? "FALANDO" : "PRONTO"
+  ctx.font = `600 8px 'Google Sans',sans-serif`; ctx.textAlign = "center"
+  ctx.fillStyle = T ? `rgba(180,120,255,${.35+pulse*.4})` : `rgba(79,195,247,${.35+pulse*.4})`
+  ctx.fillText(label, cx, cy+56)
 
-  const label = L ? "ESCUTANDO" : T ? "PROCESSANDO" : S ? "FALANDO" : "STANDBY"
-  ctx.font = "900 9px Orbitron,monospace"; ctx.textAlign = "center"
-  ctx.fillStyle = T ? `rgba(180,120,255,${.4 + pulse * .45})` : `rgba(0,185,255,${.4 + pulse * .45})`
-  ctx.fillText(label, cx, cy + 62)
-
-  animId = requestAnimationFrame(drawFace)
+  requestAnimationFrame(drawFace)
 }
 
 function setFace(key, val) { faceState[key] = val }
 
-// ── TTS (FALA) ───────────────────────────────────────────────────────────────
+// ── TTS ───────────────────────────────────────────────────────────────────────
 function speak(text) {
   if (!window.speechSynthesis) return
-  window.speechSynthesis.cancel() // Limpa filas
-  const clean = text.replace(/[*#`_~•]/g, "").slice(0, 900)
-  
-  // Usamos variável global para impedir que o áudio seja cortado pelo navegador
+  window.speechSynthesis.cancel()
+  const clean = text.replace(/[*#`_~•]/g, "").slice(0, 800)
   currentUtterance = new SpeechSynthesisUtterance(clean)
-  currentUtterance.lang = "pt-BR"; currentUtterance.rate = 1.06; currentUtterance.pitch = .82; currentUtterance.volume = 1
-  
+  currentUtterance.lang = "pt-BR"
+  currentUtterance.rate = 1.08
+  currentUtterance.pitch = 0.85
+  currentUtterance.volume = 1
   const vv = window.speechSynthesis.getVoices()
   const v = vv.find(v => v.lang.startsWith("pt") && v.name.toLowerCase().includes("google"))
            || vv.find(v => v.lang.startsWith("pt"))
   if (v) currentUtterance.voice = v
-
-  currentUtterance.onstart = () => { speakActive = true; setFace("s", true); setStatus("FALANDO", "var(--c1)") }
-  currentUtterance.onend = () => { speakActive = false; setFace("s", false); setStatus("PRONTO") }
-  currentUtterance.onerror = () => { speakActive = false; setFace("s", false); setStatus("PRONTO") }
-  
+  currentUtterance.onstart = () => { speakActive = true; setFace("s",true); setStatus("Falando","#69e0a5") }
+  currentUtterance.onend = () => { speakActive = false; setFace("s",false); setStatus("Pronto") }
+  currentUtterance.onerror = () => { speakActive = false; setFace("s",false); setStatus("Pronto") }
   window.speechSynthesis.speak(currentUtterance)
 }
 
-// ── CHAT ─────────────────────────────────────────────────────────────────────
-window.addMsg = addMsg
+// ── CHAT ──────────────────────────────────────────────────────────────────────
 function addMsg(role, content, img = null) {
   renderBubble(role, content, img)
   history.push({ role, content })
@@ -920,111 +1219,113 @@ function renderBubble(role, content, img = null) {
   const d = document.createElement("div")
   d.className = `bubble ${role === "user" ? "u" : "a"}`
   if (role === "assistant") {
-    const l = document.createElement("div"); l.className = "lbl"; l.textContent = "NEXUS"; d.appendChild(l)
+    const l = document.createElement("div"); l.className = "bubble-lbl"; l.textContent = "NEXUS"; d.appendChild(l)
   }
   if (img) {
-    const im = document.createElement("img"); im.className = "bubble-img"; im.src = `data:image/jpeg;base64,${img}`; d.appendChild(im)
+    const im = document.createElement("img"); im.className = "bubble-img"
+    im.src = `data:image/jpeg;base64,${img}`; d.appendChild(im)
   }
   const t = document.createElement("span"); t.textContent = content; d.appendChild(t)
   msgs.appendChild(d)
-  d.scrollIntoView({ behavior: "smooth" })
+  d.scrollIntoView({ behavior:"smooth" })
 }
 
 async function ask(userMsg, img = null) {
-  // BLOQUEIO DE COLISÃO: Garante que nada processe junto.
   if (genActive || !engine) return
   if (engineBusy) {
-    console.warn("A IA está ocupada no momento (provavelmente organizando memórias)");
-    addMsg("assistant", "Estou reorganizando minhas memórias agora, um segundo...");
-    return
+    addMsg("assistant","Só um segundo, tô organizando memórias..."); return
   }
-
-  engineBusy = true
-  genActive = true
+  engineBusy = true; genActive = true
   window.speechSynthesis?.cancel()
-  setFace("t", true); setStatus("PROCESSANDO", "var(--orange)")
+  setFace("t",true); setStatus("Pensando...","#ffa94d")
   document.getElementById("btn-mic").disabled = true
   document.getElementById("btn-mic").style.opacity = ".45"
 
-  addMsg("user", userMsg, img)
-  clearImg()
-
-  document.getElementById("thinking-bubble").style.display = "block"
-  document.getElementById("thinking-bubble").scrollIntoView({ behavior: "smooth" })
+  addMsg("user", userMsg, img); clearImg()
+  const tb = document.getElementById("thinking-bubble")
+  tb.style.display = "block"; tb.scrollIntoView({ behavior:"smooth" })
 
   const msgForEngine = history.slice(-10).map(m => ({
-    role: m.role,
-    content: typeof m.content === "string" ? m.content : m.content
+    role: m.role, content: typeof m.content === "string" ? m.content : m.content
   }))
 
   try {
     const stream = await engine.chat.completions.create({
-      messages: [ { role: "system", content: buildSystem() }, ...msgForEngine ],
-      max_tokens: 768,
-      temperature: 0.75,
+      messages: [{ role:"system", content:buildSystem() }, ...msgForEngine],
+      max_tokens: 600,
+      temperature: 0.8,
       stream: true
     })
 
-    document.getElementById("thinking-bubble").style.display = "none"
+    tb.style.display = "none"
     const sb = document.getElementById("stream-bubble")
     const st = document.getElementById("stream-txt")
     sb.style.display = "block"; st.textContent = ""
-    sb.scrollIntoView({ behavior: "smooth" })
-    setFace("t", false); setFace("s", true); setStatus("FALANDO", "var(--c1)")
+    sb.scrollIntoView({ behavior:"smooth" })
+    setFace("t",false); setFace("s",true); setStatus("Respondendo...","#4fc3f7")
 
     let full = ""
     for await (const chunk of stream) {
       const delta = chunk.choices[0]?.delta?.content || ""
       full += delta; st.textContent = full
-      sb.scrollIntoView({ behavior: "nearest" })
+      sb.scrollIntoView({ behavior:"nearest" })
     }
 
     document.getElementById("stream-cur").style.display = "none"
     sb.style.display = "none"
     addMsg("assistant", full)
-    setFace("s", false)
+    setFace("s",false)
     speak(full)
 
-    // Avalia extrair memórias
     const userMsgCount = history.filter(m => m.role === "user").length
     if (userMsgCount > 0 && userMsgCount % 4 === 0) {
       setTimeout(extractMemories, 3000)
     }
-  } catch (e) {
-    document.getElementById("thinking-bubble").style.display = "none"
-    if (e.message.includes("disposed") || e.message.includes("destroyed")) {
-        addMsg("assistant", "⚠ Erro de contexto. O navegador limpou a memória da GPU em segundo plano. Por favor, recarregue a página.");
+  } catch(e) {
+    tb.style.display = "none"
+    if (e.message?.includes("disposed") || e.message?.includes("destroyed")) {
+      addMsg("assistant","O navegador limpou a GPU em segundo plano. Recarregue a página.")
     } else {
-        addMsg("assistant", "⚠ Erro ao gerar resposta: " + e.message);
+      addMsg("assistant","Deu um erro aqui: " + e.message)
     }
-    setFace("t", false)
+    setFace("t",false)
   } finally {
-    engineBusy = false
-    genActive = false
+    engineBusy = false; genActive = false
     document.getElementById("stream-cur").style.display = "inline-block"
     document.getElementById("btn-mic").disabled = false
     document.getElementById("btn-mic").style.opacity = "1"
-    setStatus("PRONTO")
+    setStatus("Pronto")
   }
 }
 
-// ── STT ──────────────────────────────────────────────────────────────────────
+// ── STT ───────────────────────────────────────────────────────────────────────
 window.startListen = (e) => {
-  e?.preventDefault()
-  unlockAudio() // Destrava o som do dispositivo
+  e?.preventDefault(); unlockAudio()
   if (genActive) return
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition
   if (!SR) { toggleInput(true); return }
   window.speechSynthesis?.cancel()
   const r = new SR()
   r.lang = "pt-BR"; r.continuous = false; r.interimResults = false
-  r.onstart = () => { listenActive = true; setFace("l", true); setStatus("ESCUTANDO", "var(--green)"); document.getElementById("btn-mic").textContent = "🎙️"; document.getElementById("btn-mic").style.border = "2px solid var(--green)" }
-  r.onresult = e => { setFace("l", false); listenActive = false; ask(e.results[0][0].transcript, capturedImg) }
-  r.onerror = () => { setFace("l", false); listenActive = false; setStatus("PRONTO"); toggleInput(true) }
-  r.onend = () => { setFace("l", false); listenActive = false; document.getElementById("btn-mic").textContent = "🎤"; document.getElementById("btn-mic").style.border = "2px solid var(--c1)" }
+  r.onstart = () => {
+    listenActive = true; setFace("l",true); setStatus("Ouvindo...","#69e0a5")
+    document.getElementById("btn-mic").classList.add("listening")
+  }
+  r.onresult = e => {
+    setFace("l",false); listenActive = false
+    ask(e.results[0][0].transcript, capturedImg)
+  }
+  r.onerror = () => {
+    setFace("l",false); listenActive = false; setStatus("Pronto")
+    toggleInput(true)
+  }
+  r.onend = () => {
+    setFace("l",false); listenActive = false
+    document.getElementById("btn-mic").classList.remove("listening")
+  }
   window.currentRecog = r; r.start()
 }
-window.stopListen = () => { window.currentRecog?.stop(); setFace("l", false); listenActive = false }
+window.stopListen = () => { window.currentRecog?.stop(); setFace("l",false); listenActive = false }
 window.maybeStopListen = () => { if (listenActive) window.stopListen() }
 
 // ── TEXT INPUT ────────────────────────────────────────────────────────────────
@@ -1032,22 +1333,28 @@ window.toggleInput = (v) => {
   const bar = document.getElementById("input-bar")
   const show = v !== undefined ? v : bar.style.display !== "flex"
   bar.style.display = show ? "flex" : "none"
-  if (show) document.getElementById("txt-in").focus()
+  if (show) { document.getElementById("txt-in").focus() }
 }
 window.submitTxt = () => {
-  unlockAudio() // Destrava som
+  unlockAudio()
   const v = document.getElementById("txt-in").value.trim()
   if (!v) return
   ask(v, capturedImg)
   document.getElementById("txt-in").value = ""
+  document.getElementById("txt-in").style.height = "auto"
   toggleInput(false)
 }
-document.getElementById("txt-in").addEventListener("keydown", e => { if (e.key === "Enter") window.submitTxt() })
+document.getElementById("txt-in").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); window.submitTxt() }
+})
+document.getElementById("txt-in").addEventListener("input", function() {
+  this.style.height = "auto"; this.style.height = Math.min(this.scrollHeight, 120) + "px"
+})
 
-// ── CAMERA ───────────────────────────────────────────────────────────────────
+// ── CAMERA ────────────────────────────────────────────────────────────────────
 window.openCam = async () => {
   try {
-    const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } })
+    const s = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ideal:"environment"} } })
     document.getElementById("cam-video").srcObject = s
     document.getElementById("cam-overlay").style.display = "flex"
   } catch { alert("Câmera não disponível.") }
@@ -1060,135 +1367,119 @@ window.capturePhoto = () => {
   const v = document.getElementById("cam-video")
   const c = document.getElementById("cap-canvas")
   c.width = v.videoWidth; c.height = v.videoHeight
-  c.getContext("2d").drawImage(v, 0, 0)
-  capturedImg = c.toDataURL("image/jpeg", .85).split(",")[1]
+  c.getContext("2d").drawImage(v,0,0)
+  capturedImg = c.toDataURL("image/jpeg",.85).split(",")[1]
   window.closeCam()
-  document.getElementById("preview-img").src = `data:image/jpeg;base64,${capturedImg}`
+  document.getElementById("preview-thumb").src = `data:image/jpeg;base64,${capturedImg}`
   document.getElementById("img-preview").style.display = "flex"
 }
 window.clearImg = () => {
   capturedImg = null
   document.getElementById("img-preview").style.display = "none"
-  document.getElementById("preview-img").src = ""
+  document.getElementById("preview-thumb").src = ""
 }
 
-// ── MEMORY PANEL & SETTINGS ───────────────────────────────────────────────────
+// ── PANELS ────────────────────────────────────────────────────────────────────
+window.closeSheetOnBg = (e, id) => {
+  if (e.target === document.getElementById(id)) {
+    document.getElementById(id).style.display = "none"
+  }
+}
+
 window.openMem = () => {
   const m = loadMem()
   const html = []
-
   if (Object.keys(m.identity).length > 0) {
-    html.push(`<div class="mem-section"><h4>🪪 IDENTIDADE</h4>`)
-    for (const [k, v] of Object.entries(m.identity))
+    html.push(`<div class="mem-section"><div class="mem-sec-title">🪪 Identidade</div>`)
+    for (const [k,v] of Object.entries(m.identity))
       html.push(`<div class="mem-item"><strong>${k}</strong>: ${v}</div>`)
     html.push("</div>")
   }
   if (m.facts?.length > 0) {
-    html.push(`<div class="mem-section"><h4>📌 FATOS APRENDIDOS (${m.facts.length})</h4>`)
+    html.push(`<div class="mem-section"><div class="mem-sec-title">📌 Fatos aprendidos (${m.facts.length})</div>`)
     m.facts.forEach(f => html.push(`<div class="mem-item">${f}</div>`))
     html.push("</div>")
   }
   if (m.projects?.length > 0) {
-    html.push(`<div class="mem-section"><h4>🚀 PROJETOS</h4>`)
+    html.push(`<div class="mem-section"><div class="mem-sec-title">🚀 Projetos</div>`)
     m.projects.forEach(p => html.push(`<div class="mem-item">${p}</div>`))
     html.push("</div>")
   }
   if (m.interests?.length > 0) {
-    html.push(`<div class="mem-section"><h4>🎯 INTERESSES</h4>`)
+    html.push(`<div class="mem-section"><div class="mem-sec-title">🎯 Interesses</div>`)
     m.interests.forEach(i => html.push(`<div class="mem-item">${i}</div>`))
     html.push("</div>")
   }
-
   if (html.length === 0) {
     html.push(`<div class="mem-section"><p class="mem-empty">Ainda sem memórias. Converse com o NEXUS para ele aprender sobre você.</p></div>`)
   }
-
   if (m.lastUpdated) {
     const d = new Date(m.lastUpdated)
-    html.push(`<div style="font-size:9px;color:var(--dim);margin-top:4px">Última atualização: ${d.toLocaleString("pt-BR")}</div>`)
+    html.push(`<p style="font-size:10px;color:var(--md-on-surface-variant);margin-top:8px">Última atualização: ${d.toLocaleString("pt-BR")}</p>`)
   }
-
   document.getElementById("mem-content").innerHTML = html.join("")
-  document.getElementById("mem-panel").style.display = "flex"
+  document.getElementById("mem-sheet").style.display = "flex"
 }
-window.closeMem = () => { document.getElementById("mem-panel").style.display = "none" }
+window.closeMem = () => { document.getElementById("mem-sheet").style.display = "none" }
 window.resetMem = () => {
   if (confirm("Apagar toda a memória do NEXUS?")) {
-    localStorage.removeItem(MEM_KEY)
-    memory = defaultMem()
-    updateMemBadge()
-    window.closeMem()
-    addMsg("assistant", "Memória apagada. Voltando do zero.")
+    localStorage.removeItem(MEM_KEY); memory = defaultMem(); updateMemBadge()
+    window.closeMem(); addMsg("assistant","Memória apagada. Voltando do zero.")
   }
 }
 
 window.openSettings = () => {
-  document.getElementById("set-name-disp").textContent = userName;
-  document.getElementById("set-model-disp").textContent = selectedModel.split("-")[0];
-  document.getElementById("settings-panel").style.display = "flex";
+  document.getElementById("set-name-disp").textContent = userName
+  document.getElementById("set-model-disp").textContent = selectedModel.split("-")[0]
+  document.getElementById("settings-sheet").style.display = "flex"
 }
-window.closeSettings = () => { document.getElementById("settings-panel").style.display = "none" }
+window.closeSettings = () => { document.getElementById("settings-sheet").style.display = "none" }
 window.resetConfig = () => {
-  if (confirm("Isto recarregará o NEXUS para alterar nome ou modelo. Suas memórias serão mantidas. Deseja continuar?")) {
-    localStorage.removeItem(CFG_KEY);
-    location.reload();
+  if (confirm("Reconfigurar NEXUS? Suas memórias serão mantidas.")) {
+    localStorage.removeItem(CFG_KEY); location.reload()
   }
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function setStatus(label, color) {
-  const el = document.getElementById("status-val")
-  el.textContent = "● " + label
-  el.style.color = color || "var(--c1)"
+  document.getElementById("status-val").textContent = label
+  document.getElementById("status-dot").style.background = color || "var(--md-primary)"
 }
 function startClock() {
   const el = document.getElementById("time-disp")
-  setInterval(() => {
-    el.textContent = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-  }, 1000)
+  const update = () => {
+    el.textContent = new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})
+  }
+  update(); setInterval(update, 10000)
 }
 
-// ── SERVICE WORKER (offline) ──────────────────────────────────────────────────
+// ── SERVICE WORKER ────────────────────────────────────────────────────────────
 if ("serviceWorker" in navigator) {
   const sw = `
-const CACHE = 'nexus-shell-v1'
-const SHELL = [location.pathname]
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()))
-})
-self.addEventListener('activate', e => e.waitUntil(clients.claim()))
-self.addEventListener('fetch', e => {
-  const url = e.request.url
-  if (url.includes('fonts.googleapis') || url.includes('esm.run') || url.includes('mlc-ai')) {
-    e.respondWith(caches.open('nexus-cdn-v1').then(c =>
-      c.match(e.request).then(r => r || fetch(e.request).then(res => { c.put(e.request, res.clone()); return res }))
-    ).catch(() => fetch(e.request)))
-  } else {
-    e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)))
-  }
+const CACHE='nexus-shell-v2'
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll([location.pathname])).then(()=>self.skipWaiting())))
+self.addEventListener('activate',e=>e.waitUntil(clients.claim()))
+self.addEventListener('fetch',e=>{
+  const u=e.request.url
+  if(u.includes('fonts.googleapis')||u.includes('esm.run')||u.includes('mlc-ai')){
+    e.respondWith(caches.open('nexus-cdn-v2').then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{c.put(e.request,res.clone());return res}))).catch(()=>fetch(e.request)))
+  }else{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))}
 })`
-  const blob = new Blob([sw], { type: "application/javascript" })
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {})
+  const blob = new Blob([sw],{type:"application/javascript"})
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{})
 }
 
-// ── PWA MANIFEST INJECTION ────────────────────────────────────────────────────
+// ── PWA MANIFEST ──────────────────────────────────────────────────────────────
 const manifest = {
-  name: "NEXUS — Segundo Cérebro",
-  short_name: "NEXUS",
-  start_url: ".",
-  display: "standalone",
-  background_color: "#00060f",
-  theme_color: "#00060f",
-  orientation: "portrait",
-  icons: [{
-    src: `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%2300060f'/><circle cx='256' cy='256' r='160' fill='none' stroke='%2300d4ff' stroke-width='8'/><ellipse cx='256' cy='256' rx='160' ry='42' fill='none' stroke='%230055cc' stroke-width='4'/><ellipse cx='256' cy='256' rx='42' ry='160' fill='none' stroke='%230055cc' stroke-width='4'/><circle cx='256' cy='256' r='60' fill='%2300090f' stroke='%2300d4ff' stroke-width='5'/><text x='256' y='272' font-family='monospace' font-size='56' font-weight='900' fill='%2300d4ff' text-anchor='middle'>N</text></svg>`,
-    sizes: "512x512", type: "image/svg+xml", purpose: "any maskable"
-  }]
+  name:"NEXUS — Segundo Cérebro",short_name:"NEXUS",start_url:".",
+  display:"standalone",background_color:"#060d1a",theme_color:"#060d1a",
+  orientation:"portrait",
+  icons:[{src:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23060d1a'/><circle cx='256' cy='256' r='140' fill='none' stroke='%234fc3f7' stroke-width='10'/><text x='256' y='280' font-family='sans-serif' font-size='100' font-weight='700' fill='%234fc3f7' text-anchor='middle'>N</text></svg>`,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]
 }
-const mblob = new Blob([JSON.stringify(manifest)], { type: "application/json" })
-const mlink = document.createElement("link")
-mlink.rel = "manifest"; mlink.href = URL.createObjectURL(mblob)
-document.head.appendChild(mlink)
+const mb = new Blob([JSON.stringify(manifest)],{type:"application/json"})
+const ml = document.createElement("link")
+ml.rel = "manifest"; ml.href = URL.createObjectURL(mb)
+document.head.appendChild(ml)
 </script>
 </body>
 </html>
